@@ -1,20 +1,22 @@
 
 
-//map data to the needs of the chart, groupby etc
+// Map data to the needs of the chart, groupby etc
 function getEx1Data(data) {
 
 }
 
 
-//Obj, all data that the updateEx1Chart function needs
+// Obj, all data that the updateEx1Chart function needs
 var EX1_CONFIG = null;
 
-//Receives the filtered data!
+// Update the chart according to some request
+// Receives the filtered data!
 function updateEx1(data) {
   const transformedData = getEx1Data(data);
   //Do the transition here using EX1_CONFIG + transformedData
 }
 
+// Do the plot here
 function plotExample1(x, y, width, height, margin, data) {
   let ex1Width = width - margin.left - margin.right,
     ex1Height = height - margin.top - margin.bottom;
