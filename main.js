@@ -8,7 +8,6 @@ const SVG = d3.select("#chart-area").append("svg")
 d3.csv("data/walt_disney_movies.csv").then(data =>{
     
 
-    console.log(data)
     
     // Remove columns form dataset: Based on, Distributed By, Language, Production Company, Starring
     data.forEach(d => {
@@ -19,14 +18,7 @@ d3.csv("data/walt_disney_movies.csv").then(data =>{
         delete d["Starring"];
     });
 
-    console.log(data)
 
-    // remove all rows with missing values in any column
-    data = data.filter(d => {
-        return Object.values(d).every(val => val !== "");
-    });
-
-    console.log(data)
 
 
 
@@ -43,7 +35,7 @@ d3.csv("data/walt_disney_movies.csv").then(data =>{
     //call plots here
     //TODO, collect these parameters and inject them or hardwire inside? 
     plotExample1(data);
-    //plotBar(barLeft, barTop, barTotalWidth, barTotalHeight, barMargin, data);
+    plotBar(data);
     //..
 }).catch(function(error){
     console.log(error);
@@ -56,6 +48,6 @@ d3.csv("data/walt_disney_movies.csv").then(data =>{
 function updateCharts(updatedSelection) {
     updatedSelection.map(x => x.selected = x.ex1Selected); // && ex2Selected && ex3Selected ...);
     updateEx1(updatedSelection);
-    //updateEx2(updatedSelection);
+    updateBar(updatedSelection);
     //...
 }
