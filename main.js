@@ -5,7 +5,7 @@ const SVG = d3.select("#chart-area").append("svg")
     .attr("width", 2000)
     .attr("height", 2000);
 
-d3.csv("Data/walt_disney_movies.csv").then(data =>{
+d3.csv("data/walt_disney_movies.csv").then(data =>{
     
 
     console.log(data)
