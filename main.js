@@ -5,9 +5,31 @@ const SVG = d3.select("#chart-area").append("svg")
     .attr("width", 2000)
     .attr("height", 2000);
 
-d3.csv("source.csv").then(data =>{
+d3.csv("Data/walt_disney_movies.csv").then(data =>{
     
+
+    console.log(data)
     
+    // Remove columns form dataset: Based on, Distributed By, Language, Production Company, Starring
+    data.forEach(d => {
+        delete d["Based on"];
+        delete d["Distributed by"];
+        delete d["Language"];
+        delete d["Production company"];
+        delete d["Starring"];
+    });
+
+    console.log(data)
+
+    // remove all rows with missing values in any column
+    data = data.filter(d => {
+        return Object.values(d).every(val => val !== "");
+    });
+
+    console.log(data)
+
+
+
     // Add filterind fields + masks,
     // all of them are true -> Show all data in the beginning
     // each ex1, ex2 etc.. refer to the filter mask of a specific chart
@@ -20,7 +42,7 @@ d3.csv("source.csv").then(data =>{
 
     //call plots here
     //TODO, collect these parameters and inject them or hardwire inside? 
-    plotExample1(ex1Left, ex1Top, ex1TotalWidth, ex1TotalHeight, ex1Margin, data);
+    plotExample1(data);
     //plotBar(barLeft, barTop, barTotalWidth, barTotalHeight, barMargin, data);
     //..
 }).catch(function(error){
