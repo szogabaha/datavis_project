@@ -94,12 +94,12 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("cx", d => x(d.budget))
         .attr("cy", d => y(d.box_office))
         .attr("r", 5)
-        .attr("fill", "steelblue")
+        .attr("fill", d => d["Revenue"] > 0 ? "green" : "red") // change color based on Revenue
         .on("mouseover", function (d) {
             tooltip.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltip.html('Revenue' + "<br/> (" + d["Revenue"] + "$"+ ")")
+            tooltip.html('Revenue' + "<br/> (" + d["Revenue"].toLocaleString() + "$"+ ")")
                 .style("left", (d3.event.pageX + 5) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
         }).on("mouseout", function (d) {
