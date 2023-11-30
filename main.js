@@ -5,6 +5,19 @@ const SVG = d3.select("#chart-area").append("svg")
     .attr("width", 2000)
     .attr("height", 2000);
 
+
+    var tooltip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0)
+    .style("position", "absolute")
+    .style("text-align", "center")
+    .style("padding", "2px")
+    .style("font", "12px sans-serif")
+    .style("background", "lightsteelblue")
+    .style("border", "0px")
+    .style("border-radius", "8px")
+    .style("pointer-events", "none");
+
 d3.csv("data/walt_disney_movies.csv").then(data =>{
     
 
