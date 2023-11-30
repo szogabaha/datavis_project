@@ -44,6 +44,8 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
     plotExample1(data);
     plotBar(data);
     plotLine(data);
+    plotScatterMoney(data);
+    plotScatterScore(data);
     //..
 }).catch(function (error) {
     console.log(error);
@@ -56,5 +58,7 @@ function updateCharts(updatedSelection) {
     updateEx1(updatedSelection);
     updateBar(updatedSelection);
     updateLine(updatedSelection);
+    updateScatterMoney(updatedSelection);
+    updateScatterScore(updatedSelection);
     //...
 }
