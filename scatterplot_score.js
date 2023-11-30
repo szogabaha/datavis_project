@@ -1,14 +1,20 @@
-
+// set position of plot
+const scatter_scoreDiv = document.getElementById("scatterplot_score");
+scatter_scoreDiv.style.position = "relative";
+scatter_scoreDiv.style.left = 1000 + "px"; // adjust as needed
+scatter_scoreDiv.style.top = 0 + "px"; // adjust as needed
 
 // Map data to the needs of the chart, groupby etc
 function getScatterScoreData(data) {
 
     data = data.filter(d => d.selected);
 
-    data.forEach(item => {
-        
+    data.forEach(d => {
+        d.imdb = Number(d["imdb"]);
+        d.metascore = Number(d["metascore"]);
+        d.rotten_tomatoes = Number(d["rotten_tomatoes"]);
     });
-
+    return data;
 }
 
 
