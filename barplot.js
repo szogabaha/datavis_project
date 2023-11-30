@@ -1,5 +1,9 @@
 // Map data to the needs of the chart, groupby etc
 function getBarData(data, scorekind = "rotten_tomatoes") {
+
+  // get only those that have the field "selected" to true
+  data = data.filter(d => d.selected);
+
   data.forEach(item => {
     const date = new Date(item["Release date"]);
     item.year = date.getFullYear();
@@ -43,6 +47,7 @@ function getBarData(data, scorekind = "rotten_tomatoes") {
 
 function updateBar(data) {
   const transformedData = getBarData(data);
+  //TODO: For when I have an interactible that changes the filtered data
 }
 
 // Do the plot here
