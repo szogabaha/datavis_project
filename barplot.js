@@ -68,11 +68,9 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400, animationDela
     .attr("width", barTotalWidth)
     .attr("height", barTotalHeight);
 
-  // Select the barplot div
-  let barplotDiv = d3.select("#barplot");
 
   // Append a select element to the barplot div
-  let scoreSelect = barplotDiv.append("select")
+  let scoreSelect = d3.select("#barplot").append("select")
       .attr("id", "scoreSelect")
       .style("position", "relative")
       .style("left", "-" + 150 +  "px") // adjust as needed
