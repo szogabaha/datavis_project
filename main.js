@@ -33,7 +33,7 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
     // all of them are true -> Show all data in the beginning
     // each ex1, ex2 etc.. refer to the filter mask of a specific chart
     data.map(d => {
-        //d["ex1Selected"] = true;
+        d["linePlotSelected"] = true;
         //d["ex2Selected"] = true;
         //...
         d["selected"] = true; //This is ex1 & ex2 & ex3 mask concat, all are true when starting 
@@ -47,8 +47,7 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
         }
     });
 
-    console.log(data);
-
+    console.log(data)
     //call plots here
     //TODO, collect these parameters and inject them or hardwire inside? 
     plotExample1(data);
@@ -64,7 +63,7 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
 // Transition view into the updated state
 // UpdatedSelection is the original data with modified filter flags
 function updateCharts(updatedSelection) {
-    updatedSelection.map(x => x.selected = x.ex1Selected); // && ex2Selected && ex3Selected ...);
+    updatedSelection.map(x => x.selected = x.linePlotSelected); // && ex2Selected && ex3Selected ...);
     updateEx1(updatedSelection);
     updateBar(updatedSelection);
     updateLine(updatedSelection);
