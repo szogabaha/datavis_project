@@ -6,11 +6,10 @@ function getScatterMoneyData(data) {
     data = data.filter(d => d.selected);
 
     data.forEach(item => {
-        
+        d.budget = Number(item["Budget"]);
+        d.box_office = Number(item["Box office"]);
+        d.revenue = Number(item["Revenue"]);
     });
-
-    // caclulate revenue 
-
 }
 
 
@@ -25,13 +24,19 @@ function updateScatterMoney(data) {
 }
 
 // Do the plot here
-function plotScatterMoney(data) {
+function plotScatterMoney(data, scatterTotalWidth = 800, scatterTotalHeight = 800, animationDelay = 2000) {
 
   const transformedData = getScatterMoneyData(data)
 
-  // const g = SVG.append("g")
-  //   .attr("transform", `translate(${x + margin.left}, ${y + margin.top})`)
-  //.......
+  let margin = { top: 30, right: 30, bottom: 40, left: 100 },
+  scatterWidth = scatterTotalWidth - margin.left - margin.right,
+  scatterHeight = scatterTotalHeight - margin.top - margin.bottom;
+
+  let moneyData = getScatterMoneyData(data);
+
+  const g = SVG.append("g")
+    .attr("transform", `translate(${x + margin.left}, ${y + margin.top})`)
+
 
 
   //Store everything here that the update will need
