@@ -1,11 +1,9 @@
 // Map data to the needs of the chart, groupby etc
-function getLineData(data) {
-
+function getLineData(data, scorekind = "rotten_tomatoes") {
   // get only those that have the field "selected" to true
   data = data.filter(d => d.selected);
 
-  console.log(data);
-
+ 
 }
 
 function updateLine(data) {

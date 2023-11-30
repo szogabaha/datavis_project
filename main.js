@@ -39,6 +39,16 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
         d["selected"] = true; //This is ex1 & ex2 & ex3 mask concat, all are true when starting 
     })
 
+    data.forEach(d => {
+        if (d["Box office"] && d["Budget"]) {
+            d["Revenue"] = d["Box office"] - d["Budget"];
+        } else {
+            d["Revenue"] = "";
+        }
+    });
+
+    console.log(data);
+
     //call plots here
     //TODO, collect these parameters and inject them or hardwire inside? 
     plotExample1(data);
