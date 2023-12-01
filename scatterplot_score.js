@@ -37,7 +37,7 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
     scatterWidth = scatterTotalWidth - margin.left - margin.right,
     scatterHeight = scatterTotalHeight - margin.top - margin.bottom;
 
-    let moneyData = getScatterScoreData(data);
+    let scoreData = getScatterScoreData(data);
 
     const svg = d3.select("#scatterplot_score")
         .append("svg")
@@ -58,7 +58,7 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
     
     // add x axis
     let x = d3.scaleLinear()
-        .domain([0, d3.max(moneyData, d => d.imdb)])
+        .domain([0, d3.max(scoreData, d => d.imdb)])
         .range([0, scatterWidth]);
     g.append("g")
         .attr("transform", "translate(0," + scatterHeight + ")")
@@ -73,7 +73,7 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
 
     // add y axis
     let y = d3.scaleLinear()
-        .domain([0, d3.max(moneyData, d => d.metascore)])
+        .domain([0, d3.max(scoreData, d => d.metascore)])
         .range([scatterHeight, 0]);
     g.append("g")
         .call(d3.axisLeft(y));
@@ -86,6 +86,29 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Metascore");
+
+    // create scatterplot
+    g.selectAll("dot")
+        .data(scoreData)
+        .enter()
+        .append("circle")
+        .attr("cx", d => x(d.imdb))
+        .attr("cy", d => y(d.metascore))
+        .attr("r", 5)
+        .attr("opacity", 0.7)
+        .style("fill", "#69b3a2")
+        .on("mouseover", function (d) {
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+            tooltip.html('Audience: ' + d.rotten_tomatoes + "<br/>" + 'Critics: ' + d.metascore)
+                .style("left", (d3.event.pageX + 5) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+        }).on("mouseout", function (d) {
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
 
 
   //Store everything here that the update will need
