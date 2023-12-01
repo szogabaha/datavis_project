@@ -26,6 +26,38 @@ var EX1_CONFIG = null;
 function updateScatterMoney(data) {
     const transformedData = getScatterMoneyData(data);
     //Do the transition here using EX1_CONFIG + transformedData
+
+    // Define scales based on the new data
+    let x = d3.scaleLinear()
+        .domain([d3.min(transformedData, d => d.budget), d3.max(transformedData, d => d.budget)])
+        .range([0, scatterWidth]);
+    let y = d3.scaleLinear()
+        .domain([d3.min(transformedData, d => d.box_office), d3.max(transformedData, d => d.box_office)])
+        .range([scatterHeight, 0]);
+    var color = d3.scaleLinear()
+        .domain([d3.min(transformedData, d => d.revenue), 0, (d3.max(transformedData, d => d.revenue))/8, (d3.max(transformedData, d => d.revenue))/4 , d3.max(transformedData, d => d.revenue)])
+        .range(["red", "orange", "yellow", "green", "blue"]);
+    
+    // Select the circles and bind the new data
+    let circles = d3.select("#scatterplot_money").selectAll("circle").data(transformedData);
+
+    // Use the general update pattern to handle the enter, update, and exit selections
+    circles.enter().append("circle")
+        .attr("r", 5)
+        .attr("opacity", 0.7)
+        .merge(circles) // Merges the enter and update selections
+        .transition() // Initiates a transition
+        .duration(1000) // Specifies the duration
+        .attr("cx", d => x(d.budget))
+        .attr("cy", d => y(d.box_office))
+        .attr("fill", d => color(d.revenue));
+
+    // Transition the exiting circles to have zero radius and then remove them
+    circles.exit()
+        .transition()
+        .duration(800)
+        .attr("r", 0)
+        .remove();
 }
 
 // Do the plot here
