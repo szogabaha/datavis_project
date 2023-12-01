@@ -90,6 +90,13 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Box Office");
+
+    // define colourscale
+    var color = d3.scaleLinear()
+        .domain([d3.min(moneyData, d => d.revenue), 0, d3.max(moneyData, d => d.revenue)])
+        .range(["red", "yellow", "green"]);
+
+    // add legend
     
     // create scatterplot
     g.selectAll("circle")
@@ -98,10 +105,11 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .append("circle")
         .attr("cx", d => x(d.budget))
         .attr("cy", d => y(d.box_office))
-        .attr("r", 5)
+        .attr("r", 4)
         .attr("opacity", 0.7)
-        .attr("fill", d => d.revenue > 0 ? "green" : "red") // change color based on Revenue
+        .attr("fill", d => color(d.revenue)) // change color based on Revenue
         .on("mouseover", function (d) {
+            d3.select(this).attr('stroke', 'black').attr('stroke-width', 2); // Add black outline
             tooltip.transition()
                 .duration(200)
                 .style("opacity", .9);
@@ -109,6 +117,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
                 .style("left", (d3.event.pageX + 5) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
         }).on("mouseout", function (d) {
+            d3.select(this).attr('stroke', 'none'); // Remove black outline
             tooltip.transition()
                 .duration(500)
                 .style("opacity", 0);
