@@ -12,8 +12,12 @@ function getScatterScoreData(data) {
     data.forEach(d => {
         d.imdb = Number(d["imdb"]);
         d.metascore = Number(d["metascore"]);
-        d.rotten_tomatoes = Number(d["rotten_tomatoes"]);
+        //d.rotten_tomatoes = Number(d["rotten_tomatoes"]);
     });
+
+    // remove data items with no score
+    data = data.filter(d => !isNaN(d.imdb) && !isNaN(d.metascore));
+
     return data;
 }
 
@@ -101,7 +105,7 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
             tooltip.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltip.html('Audience: ' + d.rotten_tomatoes + "<br/>" + 'Critics: ' + d.metascore)
+            tooltip.html('Audience: ' + d.imdb + "<br/>" + 'Critics: ' + d.metascore)
                 .style("left", (d3.event.pageX + 5) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
         }).on("mouseout", function (d) {
