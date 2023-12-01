@@ -19,6 +19,7 @@ var tooltip = d3.select("body").append("div")
     .style("pointer-events", "none");
 
 d3.csv("data/walt_disney_movies.csv").then(data => {
+    console.log(data)
 
     // Remove columns form dataset: Based on, Distributed By, Language, Production Company, Starring
     data.forEach(d => {
@@ -48,6 +49,8 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
     });
 
     console.log(data)
+    data.map(x => x.selected = x.linePlotSelected); // && ex2Selected && ex3Selected ...);
+
     //call plots here
     //TODO, collect these parameters and inject them or hardwire inside? 
     plotExample1(data);

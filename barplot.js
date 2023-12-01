@@ -5,18 +5,14 @@ let x
 let y
 
 let svg
-let animationDelay = 2000
+let animationDelay = 1000
 
 // Map data to the needs of the chart, groupby etc
 function getBarData(data, scorekind = "rotten_tomatoes") {
-
+  
   // get only those that have the field "selected" to true
   data = data.filter(d => d.selected);
-
-  data.forEach(item => {
-    const date = new Date(item["Release date"]);
-    item.year = date.getFullYear();
-  });
+  
 
   // Step 2: Group the data by the extracted year.
   let groupedData = data.reduce((acc, item) => {
@@ -24,15 +20,16 @@ function getBarData(data, scorekind = "rotten_tomatoes") {
       acc[item.year] = [];
     }
     parsedscore = parseFloat(item[scorekind])
-    if (!isNaN(parsedscore)) {
+    if (!isNaN(parsedscore) && (parsedscore != 0)) {
       acc[item.year].push(parsedscore);
     }
     return acc;
   }, {});
-  
+
+  console.log(groupedData)
   //remove key NaN
   delete groupedData["NaN"]
-  
+
 
   // Step 3: For each group, calculate the average of the "imdb" field.
   let returnData = {};
@@ -71,25 +68,26 @@ function updateBar(data) {
 
   // Update the bars
   bars.attr("x", (d) => x(d))
-  .attr("y", (d) => y(yearScores[d]))
-  .attr("width", x.bandwidth())
-  .attr("height", (d) => y(0) - y(yearScores[d]))
-  .transition()
-  .duration(animationDelay)
-  .attr("x", (d) => x(d))
-  .attr("y", (d) => y(allYearsData[d]))
-  .attr("width", x.bandwidth())
-  .attr("height", (d) => y(0) - y(allYearsData[d]));
+    .attr("y", (d) => y(yearScores[d]))
+    .attr("width", x.bandwidth())
+    .attr("height", (d) => y(0) - y(yearScores[d]))
+    .transition()
+    .duration(animationDelay)
+    .attr("x", (d) => x(d))
+    .attr("y", (d) => y(allYearsData[d]))
+    .attr("width", x.bandwidth())
+    .attr("height", (d) => y(0) - y(allYearsData[d]));
+    
 
   yearScores = allYearsData;
 }
 
 // Do the plot here
 function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400) {
-  
+
   let barMargin = { top: 30, right: 30, bottom: 40, left: 100 },
-  barWidth = barTotalWidth - barMargin.left - barMargin.right,
-  barHeight = barTotalHeight - barMargin.top - barMargin.bottom;
+    barWidth = barTotalWidth - barMargin.left - barMargin.right,
+    barHeight = barTotalHeight - barMargin.top - barMargin.bottom;
 
   yearScores = getBarData(data, "metascore");
 
@@ -100,29 +98,29 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400) {
   svg = d3.select("#barplot")
     .append("svg")
     .attr("width", barTotalWidth)
-    .attr("height", barTotalHeight+40);
+    .attr("height", barTotalHeight + 40);
 
 
   // Append a select element to the barplot div
   let scoreSelect = d3.select("#barplot").append("select")
-      .attr("id", "scoreSelect")
-      .style("position", "relative")
-      .style("right", "150px") // adjust as needed
-      .style("top", "-410px"); // adjust as needed
+    .attr("id", "scoreSelect")
+    .style("position", "relative")
+    .style("right", "150px") // adjust as needed
+    .style("top", "-410px"); // adjust as needed
 
   // Append option elements to the select element
-  
-  scoreSelect.append("option")
-        .attr("value", "metascore")
-        .text("Metascore");
-  
-        scoreSelect.append("option")
-      .attr("value", "rotten_tomatoes")
-      .text("Rotten Tomatoes");
 
   scoreSelect.append("option")
-      .attr("value", "imdb")
-      .text("IMDB");
+    .attr("value", "metascore")
+    .text("Metascore");
+
+  scoreSelect.append("option")
+    .attr("value", "rotten_tomatoes")
+    .text("Rotten Tomatoes");
+
+  scoreSelect.append("option")
+    .attr("value", "imdb")
+    .text("IMDB");
 
   x = d3.scaleBand()
     .domain(years)
@@ -143,26 +141,26 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400) {
     .attr("width", x.bandwidth())
     .attr("height", (d) => y(0) - y(yearScores[d]))
     .attr("fill", "#69b3a2")
-    .on("mouseover", function(d) {
+    .on("mouseover", function (d) {
       tooltip.transition()
-          .duration(200)
-          .style("opacity", .9);
-          tooltip.html("Year: " + d + "<br/>" + "Avg. Score: " + yearScores[d])
-          .style("left", (d3.event.pageX) + "px")
-          .style("top", (d3.event.pageY - 28) + "px");
-  })
-  .on("mouseout", function(d) {
+        .duration(200)
+        .style("opacity", .9);
+      tooltip.html("Year: " + d + "<br/>" + "Avg. Score: " + yearScores[d])
+        .style("left", (d3.event.pageX) + "px")
+        .style("top", (d3.event.pageY - 28) + "px");
+    })
+    .on("mouseout", function (d) {
       tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
-  });
+        .duration(500)
+        .style("opacity", 0);
+    });
 
 
   // Add X and Y axis
   svg.append("g")
     .attr("transform", `translate(0, ${barTotalHeight - barMargin.bottom})`)
     .call(d3.axisBottom(x))
-    .selectAll("text")  
+    .selectAll("text")
     .style("text-anchor", "end")
     .attr("dx", "-.8em")
     .attr("dy", "-.3em")
@@ -196,7 +194,7 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400) {
     .text("Year");
 
 
-  document.getElementById('scoreSelect').addEventListener('change', function() {
+  document.getElementById('scoreSelect').addEventListener('change', function () {
     let scoreType = this.value;
     let averageData = getBarData(data, scoreType);
     bars = svg.selectAll("rect").data(Object.keys(averageData));
@@ -220,11 +218,12 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400) {
       .attr("y", (d) => y(averageData[d]))
       .attr("width", x.bandwidth())
       .attr("height", (d) => y(0) - y(averageData[d]));
-    
+
     yearScores = averageData;
-    });
+  });
 
 
+  updateBar(data);
 
 
 }

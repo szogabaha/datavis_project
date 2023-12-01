@@ -70,15 +70,13 @@ function getLineData(data, scorekind = "rotten_tomatoes") {
 function updateLine(data) {
   let [newRevenueData, newRunningTimeData] = getLineData(data);
   const newRevenueArray = Object.entries(newRevenueData).map(([year, revenue]) => ({ year: parseInt(year), revenue }));
-    
+
 }
 
 
 function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
 
   let [revenueData, runningTimeData] = getLineData(data);
-  console.log(revenueData)
-  console.log(runningTimeData)
 
   // Convert revenueData object to an array of objects for easier use with D3
   revenueArray = Object.entries(revenueData).map(([year, revenue]) => ({ year: parseInt(year), revenue }));
@@ -267,7 +265,6 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
 
   function updateDataSelection() {
     var extent = d3.brushSelection(this);
-    console.log(extent);
     if (extent != null) {
       selection = extent.map(x.invert).map(Math.round);
       console.log(selection);
