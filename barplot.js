@@ -68,15 +68,15 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400, animationDela
   const svg = d3.select("#barplot")
     .append("svg")
     .attr("width", barTotalWidth)
-    .attr("height", barTotalHeight);
+    .attr("height", barTotalHeight+40);
 
 
   // Append a select element to the barplot div
   let scoreSelect = d3.select("#barplot").append("select")
       .attr("id", "scoreSelect")
       .style("position", "relative")
-      .style("left", "-" + 150 +  "px") // adjust as needed
-      .style("top", "-" + (barTotalHeight-30) +  "px"); // adjust as needed
+      .style("right", "150px") // adjust as needed
+      .style("top", "-410px"); // adjust as needed
 
   // Append option elements to the select element
   scoreSelect.append("option")
@@ -143,22 +143,23 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400, animationDela
     .attr("x", barMargin.left + barWidth / 2)
     .attr("y", barMargin.top)
     .attr("text-anchor", "middle")
-    .attr("font-size", "12px")
+    .attr("font-size", "16px")
+    .style("text-decoration", "underline")
     .text("Critics' Score Evolution");
 
   svg.append("text")
     .attr("x", barMargin.top)
     .attr("y", barMargin.left - 15)
     .attr("text-anchor", "middle")
-    .attr("font-size", "12px")
+    .attr("font-size", "20px")
     .text("Average Score")
-    .attr("transform", "rotate(-90, 0, 0) translate(-" + (barTotalHeight / 2) + ", -10)");
+    .attr("transform", "rotate(-90, 0, 0) translate(-" + (barTotalHeight / 2) + ", -20)");
 
   svg.append("text")
     .attr("x", barMargin.left + barWidth / 2)
-    .attr("y", barMargin.bottom + barHeight + 30)
+    .attr("y", barMargin.bottom + barHeight + 40)
     .attr("text-anchor", "middle")
-    .attr("font-size", "12px")
+    .attr("font-size", "20px")
     .text("Year");
 
 
