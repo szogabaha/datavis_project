@@ -16,6 +16,8 @@ function getScatterMoneyData(data) {
     });
     // remove data items with no value
     data = data.filter(d => !isNaN(d.budget) && !isNaN(d.box_office) && !isNaN(d.revenue));
+    // remove data items with zero value
+    data = data.filter(d => d.budget > 0 && d.box_office > 0);
     
     return data;
 }
@@ -64,7 +66,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .range([0, scatterWidth]);
     g.append("g")
         .attr("transform", "translate(0," + scatterHeight + ")")
-        .call(d3.axisBottom(x));
+        .call(d3.axisBottom(x).tickFormat(d3.format(".2s")));
 
     // add x axis label
     g.append("text")
@@ -78,7 +80,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .domain([0, d3.max(moneyData, d => d.box_office)])
         .range([scatterHeight, 0]);
     g.append("g")
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y).tickFormat(d3.format(".2s")));
     
     // add y axis label
     g.append("text")
@@ -103,7 +105,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
             tooltip.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltip.html('Revenue' + "<br/> (" + d.revenue.toLocaleString() + "$"+ ")")
+            tooltip.html(d.title + '<br/>' + 'Revenue: ' + "<br/>" + d.revenue.toLocaleString() + "$")
                 .style("left", (d3.event.pageX + 5) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
         }).on("mouseout", function (d) {
