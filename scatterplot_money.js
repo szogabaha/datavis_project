@@ -91,7 +91,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
 
     // define colourscale
     var color = d3.scaleLinear()
-        .domain([d3.min(moneyData, d => d.revenue), (d3.min(moneyData, d => d.revenue))/4, 0, (d3.max(moneyData, d => d.revenue))/4 , d3.max(moneyData, d => d.revenue)])
+        .domain([d3.min(moneyData, d => d.revenue), 0, (d3.max(moneyData, d => d.revenue))/8, (d3.max(moneyData, d => d.revenue))/4 , d3.max(moneyData, d => d.revenue)])
         .range(["red", "orange", "yellow", "green", "blue"]);
 
     // add legend title
