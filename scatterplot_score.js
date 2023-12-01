@@ -1,8 +1,8 @@
 // set position of plot
 const scatter_scoreDiv = document.getElementById("scatterplot_score");
 scatter_scoreDiv.style.position = "relative";
-scatter_scoreDiv.style.left = 1000 + "px"; // adjust as needed
-scatter_scoreDiv.style.top = -350 + "px"; // adjust as needed
+scatter_scoreDiv.style.left = 1000 + "px";
+scatter_scoreDiv.style.top = -350 + "px"; 
 
 // Map data to the needs of the chart, groupby etc
 function getScatterScoreData(data) {
@@ -12,8 +12,14 @@ function getScatterScoreData(data) {
     data.forEach(d => {
         d.imdb = Number(d["imdb"]);
         d.metascore = Number(d["metascore"]);
-        d.rotten_tomatoes = Number(d["rotten_tomatoes"]);
+        //d.rotten_tomatoes = Number(d["rotten_tomatoes"]);
     });
+
+    // remove data items with no score
+    data = data.filter(d => !isNaN(d.imdb) && !isNaN(d.metascore));
+    // remove data items with zero score
+    data = data.filter(d => d.imdb > 0 && d.metascore > 0);
+
     return data;
 }
 
@@ -37,7 +43,7 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
     scatterWidth = scatterTotalWidth - margin.left - margin.right,
     scatterHeight = scatterTotalHeight - margin.top - margin.bottom;
 
-    let moneyData = getScatterScoreData(data);
+    let scoreData = getScatterScoreData(data);
 
     const svg = d3.select("#scatterplot_score")
         .append("svg")
@@ -58,7 +64,7 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
     
     // add x axis
     let x = d3.scaleLinear()
-        .domain([0, d3.max(moneyData, d => d.imdb)])
+        .domain([0, 10])
         .range([0, scatterWidth]);
     g.append("g")
         .attr("transform", "translate(0," + scatterHeight + ")")
@@ -69,11 +75,11 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("x", scatterWidth / 2)
         .attr("y", scatterHeight + margin.bottom)
         .attr("text-anchor", "middle")
-        .text("IMDB Score");
+        .text("Audience: IMDB Score");
 
     // add y axis
     let y = d3.scaleLinear()
-        .domain([0, d3.max(moneyData, d => d.metascore)])
+        .domain([0, 100])
         .range([scatterHeight, 0]);
     g.append("g")
         .call(d3.axisLeft(y));
@@ -85,7 +91,30 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("x", 0 - (scatterHeight / 2))
         .attr("dy", "1em")
         .style("text-anchor", "middle")
-        .text("Metascore");
+        .text("Critics: Metascore");
+
+    // create scatterplot
+    g.selectAll("dot")
+        .data(scoreData)
+        .enter()
+        .append("circle")
+        .attr("cx", d => x(d.imdb))
+        .attr("cy", d => y(d.metascore))
+        .attr("r", 5)
+        .attr("opacity", 0.7)
+        .style("fill", "#69b3a2")
+        .on("mouseover", function (d) {
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+            tooltip.html('Audience: ' + d.imdb + "<br/>" + 'Critics: ' + d.metascore)
+                .style("left", (d3.event.pageX + 5) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+        }).on("mouseout", function (d) {
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
 
 
   //Store everything here that the update will need

@@ -1,8 +1,8 @@
 // set position of plot
 const scatterDiv = document.getElementById("scatterplot_money");
 scatterDiv.style.position = "relative";
-scatterDiv.style.left = 1000 + "px"; // adjust as needed
-scatterDiv.style.top = -400 + "px"; // adjust as needed
+scatterDiv.style.left = 1000 + "px"; 
+scatterDiv.style.top = -400 + "px"; 
 
 // Map data to the needs of the chart, groupby etc
 function getScatterMoneyData(data) {
@@ -14,6 +14,11 @@ function getScatterMoneyData(data) {
         d.box_office = Number(d["Box office"]);
         d.revenue = Number(d["Revenue"]);
     });
+    // remove data items with no value
+    data = data.filter(d => !isNaN(d.budget) && !isNaN(d.box_office) && !isNaN(d.revenue));
+    // remove data items with zero value
+    data = data.filter(d => d.budget > 0 && d.box_office > 0);
+    
     return data;
 }
 
@@ -61,7 +66,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .range([0, scatterWidth]);
     g.append("g")
         .attr("transform", "translate(0," + scatterHeight + ")")
-        .call(d3.axisBottom(x));
+        .call(d3.axisBottom(x).tickFormat(d3.format(".2s")));
 
     // add x axis label
     g.append("text")
@@ -75,7 +80,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .domain([0, d3.max(moneyData, d => d.box_office)])
         .range([scatterHeight, 0]);
     g.append("g")
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y).tickFormat(d3.format(".2s")));
     
     // add y axis label
     g.append("text")
@@ -85,6 +90,42 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("dy", "1em")
         .style("text-anchor", "middle")
         .text("Box Office");
+
+    // define colourscale
+    var color = d3.scaleLinear()
+        .domain([d3.min(moneyData, d => d.revenue), (d3.min(moneyData, d => d.revenue))/4, 0, (d3.max(moneyData, d => d.revenue))/4 , d3.max(moneyData, d => d.revenue)])
+        .range(["red", "orange", "yellow", "green", "blue"]);
+
+    // add legend title
+    g.append("text")
+        .attr("x", scatterWidth - 18)
+        .attr("y", -20)
+        .attr("text-anchor", "end")
+        .style("font-size", "12px")
+        .text("Revenue");
+    
+    // add legend
+    var legend = svg.selectAll(".legend")
+        .data(color.domain())
+        .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", (d, i) => "translate(100," + (i * 12 + 20) +")");
+
+    // draw legend colored rectangles
+    legend.append("rect")
+        .attr("x", scatterWidth - 18)
+        .attr("width", 12)
+        .attr("height", 12)
+        .style("fill", color);
+
+    // draw legend text
+    legend.append("text")
+        .attr("x", scatterWidth - 24)
+        .attr("y", 8)
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .style("font-size", "10px")
+        .text(d => d.toLocaleString() + " $");
     
     // create scatterplot
     g.selectAll("circle")
@@ -93,16 +134,19 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .append("circle")
         .attr("cx", d => x(d.budget))
         .attr("cy", d => y(d.box_office))
-        .attr("r", 5)
-        .attr("fill", d => d["Revenue"] > 0 ? "green" : "red") // change color based on Revenue
+        .attr("r", 4)
+        .attr("opacity", 0.7)
+        .attr("fill", d => color(d.revenue)) // change color based on Revenue
         .on("mouseover", function (d) {
+            d3.select(this).attr('stroke', 'black').attr('stroke-width', 2); // Add black outline
             tooltip.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltip.html('Revenue' + "<br/> (" + d["Revenue"].toLocaleString() + "$"+ ")")
+            tooltip.html(d.title + '<br/>' + 'Revenue: ' + "<br/>" + d.revenue.toLocaleString() + "$")
                 .style("left", (d3.event.pageX + 5) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
         }).on("mouseout", function (d) {
+            d3.select(this).attr('stroke', 'none'); // Remove black outline
             tooltip.transition()
                 .duration(500)
                 .style("opacity", 0);
