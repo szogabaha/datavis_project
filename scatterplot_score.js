@@ -42,6 +42,10 @@ function updateScatterScore(data) {
         .domain([d3.min(transformedData, d => d.revenue), 0, (d3.max(transformedData, d => d.revenue))/8, (d3.max(transformedData, d => d.revenue))/4 , d3.max(transformedData, d => d.revenue)])
         .range(["red", "orange", "yellow", "green", "blue"]);
 
+     // Update the axes
+     d3.select("#xAxis_score").transition().duration(1000).call(d3.axisBottom(x).tickFormat(d => "$" + d3.format(".2s")(d)));
+     d3.select("#yAxis_score").transition().duration(1000).call(d3.axisLeft(y).tickFormat(d => "$" + d3.format(".2s")(d))); 
+    
     // Select the circles and bind the new data
     let circles = d3.select("#scatterplot_score").selectAll("circle").data(transformedData);
 
@@ -94,6 +98,7 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .range([0, scatterWidth]);
     g.append("g")
         .attr("transform", "translate(0," + scatterHeight + ")")
+        .attr("id", "xAxis_score")
         .call(d3.axisBottom(x));
 
     // add x axis label
@@ -109,6 +114,7 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .domain([d3.min(scoreData, d => d. metascore), d3.max(scoreData, d => d.metascore)])
         .range([scatterHeight, 0]);
     g.append("g")
+        .attr("id", "yAxis_score")
         .call(d3.axisLeft(y));
 
     // add y axis label
