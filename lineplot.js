@@ -153,11 +153,13 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
   svg.append('text')
     .attr('transform', `translate(${width / 2}, ${height - margin.bottom / 2})`)
     .style('text-anchor', 'middle')
+    .attr("font-size", "20px")
     .text('Year');
 
   svg.append('text')
-    .attr('transform', `rotate(-90) translate(${-height / 2}, ${margin.left / 6})`)
+    .attr('transform', `rotate(-90) translate(${(-height / 2)+30}, ${margin.left / 6})`)
     .style('text-anchor', 'middle')
+    .attr("font-size", "20px")
     .text('Revenue');
 
 
@@ -210,6 +212,7 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
     .attr('y', 9)
     .attr('dy', '.35em')
     .style('text-anchor', 'start')
+    .attr("font-size", "20px")
     .text(legendLabel);
 
   const legend2 = svg.append('g')
@@ -227,6 +230,7 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
     .attr('y', 9)
     .attr('dy', '.24em')
     .style('text-anchor', 'start')
+    .attr("font-size", "20px")
     .text('Running Time');
 
   // Append a `g` element for each data point in runningTimeData
@@ -290,6 +294,14 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
   svg.append("g")
     .attr("class", "brush")
     .call(brush);
+
+  svg.append("text")
+    .attr("x", 40+(width / 2))
+    .attr("y", margin.top)
+    .attr("text-anchor", "middle")
+    .attr("font-size", "16px")
+    .style("text-decoration", "underline")
+    .text("Critics' Score Evolution");
 
 }
 
