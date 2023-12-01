@@ -1,8 +1,3 @@
-// set position of plot
-const scatter_scoreDiv = document.getElementById("scatterplot_score");
-scatter_scoreDiv.style.position = "relative";
-scatter_scoreDiv.style.left = 1000 + "px";
-scatter_scoreDiv.style.top = -350 + "px"; 
 
 // Map data to the needs of the chart, groupby etc
 function getScatterScoreData(data) {

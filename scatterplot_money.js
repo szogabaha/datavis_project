@@ -1,8 +1,4 @@
-// set position of plot
-const scatterDiv = document.getElementById("scatterplot_money");
-scatterDiv.style.position = "relative";
-scatterDiv.style.left = 1000 + "px"; 
-scatterDiv.style.top = -400 + "px"; 
+
 
 // Map data to the needs of the chart, groupby etc
 function getScatterMoneyData(data) {
