@@ -26,6 +26,38 @@ var EX1_CONFIG = null;
 function updateScatterMoney(data) {
     const transformedData = getScatterMoneyData(data);
     //Do the transition here using EX1_CONFIG + transformedData
+
+    // Define scales based on the new data
+    let x = d3.scaleLinear()
+        .domain([d3.min(transformedData, d => d.budget), d3.max(transformedData, d => d.budget)])
+        .range([0, scatterWidth]);
+    let y = d3.scaleLinear()
+        .domain([d3.min(transformedData, d => d.box_office), d3.max(transformedData, d => d.box_office)])
+        .range([scatterHeight, 0]);
+    var color = d3.scaleLinear()
+        .domain([d3.min(transformedData, d => d.revenue), 0, (d3.max(transformedData, d => d.revenue))/8, (d3.max(transformedData, d => d.revenue))/4 , d3.max(transformedData, d => d.revenue)])
+        .range(["red", "orange", "yellow", "green", "blue"]);
+    
+    // Select the circles and bind the new data
+    let circles = d3.select("#scatterplot_money").selectAll("circle").data(transformedData);
+
+    // Use the general update pattern to handle the enter, update, and exit selections
+    circles.enter().append("circle")
+        .attr("r", 5)
+        .attr("opacity", 0.7)
+        .merge(circles) // Merges the enter and update selections
+        .transition() // Initiates a transition
+        .duration(1000) // Specifies the duration
+        .attr("cx", d => x(d.budget))
+        .attr("cy", d => y(d.box_office))
+        .attr("fill", d => color(d.revenue));
+
+    // Transition the exiting circles to have zero radius and then remove them
+    circles.exit()
+        .transition()
+        .duration(800)
+        .attr("r", 0)
+        .remove();
 }
 
 // Do the plot here
@@ -50,9 +82,9 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
     // add title
     g.append("text")
         .attr("x", (scatterWidth / 2))
-        .attr("y", 0 - (margin.top / 2))
+        .attr("y", 10 - (margin.top / 2))
         .attr("text-anchor", "middle")
-        .attr("font-size", "16px")
+        .attr("font-size", "25px")
         .style("text-decoration", "underline")
         .text("Budget vs Box Office");
     
@@ -62,40 +94,42 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .range([0, scatterWidth]);
     g.append("g")
         .attr("transform", "translate(0," + scatterHeight + ")")
-        .call(d3.axisBottom(x).tickFormat(d3.format(".2s")));
+        .call(d3.axisBottom(x).tickFormat(d => "$" + d3.format(".2s")(d)));
 
     // add x axis label
     g.append("text")
         .attr("x", scatterWidth / 2)
-        .attr("y", scatterHeight + margin.bottom)
+        .attr("y", scatterHeight + margin.bottom - 5)
         .attr("text-anchor", "middle")
-        .text("Budget");
+        .attr("font-size", "20px")
+        .text("Budget (million $)");
 
     // add y axis
     let y = d3.scaleLinear()
         .domain([0, d3.max(moneyData, d => d.box_office)])
         .range([scatterHeight, 0]);
     g.append("g")
-        .call(d3.axisLeft(y).tickFormat(d3.format(".2s")));
+        .call(d3.axisLeft(y).tickFormat(d => "$" + d3.format(".2s")(d)));
     
     // add y axis label
     g.append("text")
         .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left + 40)
+        .attr("y", 0 - margin.left + 30)
         .attr("x", 0 - (scatterHeight / 2))
         .attr("dy", "1em")
+        .attr("font-size", "20px")
         .style("text-anchor", "middle")
         .text("Box Office");
 
     // define colourscale
     var color = d3.scaleLinear()
-        .domain([d3.min(moneyData, d => d.revenue), (d3.min(moneyData, d => d.revenue))/4, 0, (d3.max(moneyData, d => d.revenue))/4 , d3.max(moneyData, d => d.revenue)])
+        .domain([d3.min(moneyData, d => d.revenue), 0, (d3.max(moneyData, d => d.revenue))/8, (d3.max(moneyData, d => d.revenue))/4 , d3.max(moneyData, d => d.revenue)])
         .range(["red", "orange", "yellow", "green", "blue"]);
 
     // add legend title
     g.append("text")
-        .attr("x", scatterWidth - 18)
-        .attr("y", -20)
+        .attr("x", scatterWidth - 10)
+        .attr("y", -15)
         .attr("text-anchor", "end")
         .style("font-size", "12px")
         .text("Revenue");
@@ -114,6 +148,17 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("height", 12)
         .style("fill", color);
 
+    // helper function to format numbers
+    function formatNumber(num) {
+        if (num <= -1e6) {
+            return "-$" + Math.abs((num / 1e6).toFixed(1)) + "M";
+        } else if (num >= 1e6) {
+            return "$" + (num / 1e6).toFixed(1) + "M";
+        } else {
+            return "$" + num;
+        }
+    }
+
     // draw legend text
     legend.append("text")
         .attr("x", scatterWidth - 24)
@@ -121,7 +166,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("dy", ".35em")
         .style("text-anchor", "end")
         .style("font-size", "10px")
-        .text(d => d.toLocaleString() + " $");
+        .text(d => formatNumber(d));
     
     // create scatterplot
     g.selectAll("circle")
@@ -138,7 +183,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
             tooltip.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltip.html(d.title + '<br/>' + 'Revenue: ' + "<br/>" + d.revenue.toLocaleString() + "$")
+            tooltip.html(d.title + '<br/>' + 'Revenue: ' + "<br/> $" + d.revenue.toLocaleString())
                 .style("left", (d3.event.pageX + 5) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
         }).on("mouseout", function (d) {
