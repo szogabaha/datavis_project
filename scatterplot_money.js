@@ -50,9 +50,9 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
     // add title
     g.append("text")
         .attr("x", (scatterWidth / 2))
-        .attr("y", 0 - (margin.top / 2))
+        .attr("y", 10 - (margin.top / 2))
         .attr("text-anchor", "middle")
-        .attr("font-size", "16px")
+        .attr("font-size", "25px")
         .style("text-decoration", "underline")
         .text("Budget vs Box Office");
     
@@ -67,8 +67,9 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
     // add x axis label
     g.append("text")
         .attr("x", scatterWidth / 2)
-        .attr("y", scatterHeight + margin.bottom)
+        .attr("y", scatterHeight + margin.bottom - 5)
         .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
         .text("Budget");
 
     // add y axis
@@ -81,9 +82,10 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
     // add y axis label
     g.append("text")
         .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left + 40)
+        .attr("y", 0 - margin.left + 30)
         .attr("x", 0 - (scatterHeight / 2))
         .attr("dy", "1em")
+        .attr("font-size", "20px")
         .style("text-anchor", "middle")
         .text("Box Office");
 
