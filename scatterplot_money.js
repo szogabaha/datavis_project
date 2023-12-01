@@ -93,10 +93,39 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
 
     // define colourscale
     var color = d3.scaleLinear()
-        .domain([d3.min(moneyData, d => d.revenue), 0, d3.max(moneyData, d => d.revenue)])
-        .range(["red", "yellow", "green"]);
+        .domain([d3.min(moneyData, d => d.revenue), (d3.min(moneyData, d => d.revenue))/4, 0, (d3.max(moneyData, d => d.revenue))/4 , d3.max(moneyData, d => d.revenue)])
+        .range(["red", "orange", "yellow", "green", "blue"]);
 
+    // add legend title
+    g.append("text")
+        .attr("x", scatterWidth - 18)
+        .attr("y", -20)
+        .attr("text-anchor", "end")
+        .style("font-size", "12px")
+        .text("Revenue");
+    
     // add legend
+    var legend = svg.selectAll(".legend")
+        .data(color.domain())
+        .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", (d, i) => "translate(100," + (i * 12 + 20) +")");
+
+    // draw legend colored rectangles
+    legend.append("rect")
+        .attr("x", scatterWidth - 18)
+        .attr("width", 12)
+        .attr("height", 12)
+        .style("fill", color);
+
+    // draw legend text
+    legend.append("text")
+        .attr("x", scatterWidth - 24)
+        .attr("y", 8)
+        .attr("dy", ".35em")
+        .style("text-anchor", "end")
+        .style("font-size", "10px")
+        .text(d => d.toLocaleString() + " $");
     
     // create scatterplot
     g.selectAll("circle")
