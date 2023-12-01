@@ -1,4 +1,11 @@
+let bars
+let yearScores
 
+let x
+let y
+
+let svg
+let animationDelay = 2000
 
 // Map data to the needs of the chart, groupby etc
 function getBarData(data, scorekind = "rotten_tomatoes") {
@@ -28,7 +35,7 @@ function getBarData(data, scorekind = "rotten_tomatoes") {
   
 
   // Step 3: For each group, calculate the average of the "imdb" field.
-  let averageData = {};
+  let returnData = {};
   for (let year in groupedData) {
     //if its imdb multiply by 10 each mark
     if (scorekind == "imdb") {
@@ -36,36 +43,61 @@ function getBarData(data, scorekind = "rotten_tomatoes") {
     }
     //set avg as 0 if no data
     if (groupedData[year].length == 0) {
-      averageData[year] = 0;
+      returnData[year] = 0;
       continue;
     }
     let sum = groupedData[year].reduce((a, b) => a + b, 0);
     let avg = sum / groupedData[year].length;
-    averageData[year] = avg;
+    returnData[year] = avg;
   }
-  return averageData;
+  return returnData;
 
 }
 
 function updateBar(data) {
-  const transformedData = getBarData(data);
-  //TODO: For when I have an interactible that changes the filtered data
+  let scoreSelect = d3.select("#scoreSelect").node().value;
+  console.log(scoreSelect);
+  let newAverageData = getBarData(data, scoreSelect);
+  // Initialize all years to 0
+  let allYearsData = {};
+  for (let year = 1900; year <= new Date().getFullYear(); year++) {
+    allYearsData[year] = 0;
+  }
+
+  // Update the years present in newAverageData
+  for (let year in newAverageData) {
+    allYearsData[year] = newAverageData[year];
+  }
+
+  // Update the bars
+  bars.attr("x", (d) => x(d))
+  .attr("y", (d) => y(yearScores[d]))
+  .attr("width", x.bandwidth())
+  .attr("height", (d) => y(0) - y(yearScores[d]))
+  .transition()
+  .duration(animationDelay)
+  .attr("x", (d) => x(d))
+  .attr("y", (d) => y(allYearsData[d]))
+  .attr("width", x.bandwidth())
+  .attr("height", (d) => y(0) - y(allYearsData[d]));
+
+  yearScores = allYearsData;
 }
 
 // Do the plot here
-function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400, animationDelay = 2000) {
+function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400) {
   
   let barMargin = { top: 30, right: 30, bottom: 40, left: 100 },
   barWidth = barTotalWidth - barMargin.left - barMargin.right,
   barHeight = barTotalHeight - barMargin.top - barMargin.bottom;
 
-  let yearScores = getBarData(data, "metascore");
+  yearScores = getBarData(data, "metascore");
 
 
   const years = Object.keys(yearScores);
   const avgScores = Object.values(yearScores);
 
-  const svg = d3.select("#barplot")
+  svg = d3.select("#barplot")
     .append("svg")
     .attr("width", barTotalWidth)
     .attr("height", barTotalHeight+40);
@@ -79,7 +111,12 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400, animationDela
       .style("top", "-410px"); // adjust as needed
 
   // Append option elements to the select element
+  
   scoreSelect.append("option")
+        .attr("value", "metascore")
+        .text("Metascore");
+  
+        scoreSelect.append("option")
       .attr("value", "rotten_tomatoes")
       .text("Rotten Tomatoes");
 
@@ -87,21 +124,17 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400, animationDela
       .attr("value", "imdb")
       .text("IMDB");
 
-  scoreSelect.append("option")
-      .attr("value", "metascore")
-      .text("Metascore");
-
-  const x = d3.scaleBand()
+  x = d3.scaleBand()
     .domain(years)
     .range([barMargin.left, barTotalWidth - barMargin.right]);
 
-  const y = d3.scaleLinear()
+  y = d3.scaleLinear()
     .domain([0, 100])
     .range([barTotalHeight - barMargin.bottom, barMargin.top]);
 
 
 
-  svg.selectAll("rect")
+  bars = svg.selectAll("rect")
     .data(years)
     .enter()
     .append("rect")
@@ -114,7 +147,7 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400, animationDela
       tooltip.transition()
           .duration(200)
           .style("opacity", .9);
-          tooltip.html("Year: " + d + "<br/>" + "Avg. Score: " + yearScores[d].toFixed(2))
+          tooltip.html("Year: " + d + "<br/>" + "Avg. Score: " + yearScores[d])
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY - 28) + "px");
   })
@@ -166,7 +199,7 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400, animationDela
   document.getElementById('scoreSelect').addEventListener('change', function() {
     let scoreType = this.value;
     let averageData = getBarData(data, scoreType);
-    let bars = svg.selectAll("rect").data(Object.keys(averageData));
+    bars = svg.selectAll("rect").data(Object.keys(averageData));
 
 
     // Use the .enter() method to create new bars for any new data
