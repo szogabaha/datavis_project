@@ -67,12 +67,6 @@ function getLineData(data, scorekind = "rotten_tomatoes") {
   return [revenueData, runningTimeData];
 }
 
-function updateLine(data) {
-  let [newRevenueData, newRunningTimeData] = getLineData(data);
-  const newRevenueArray = Object.entries(newRevenueData).map(([year, revenue]) => ({ year: parseInt(year), revenue }));
-
-}
-
 
 function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
 
@@ -159,7 +153,7 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
     .text('Year');
 
   svg.append('text')
-    .attr('transform', `rotate(-90) translate(${(-height / 2)+30}, ${margin.left / 6})`)
+    .attr('transform', `rotate(-90) translate(${(-height / 2) + 30}, ${margin.left / 6})`)
     .style('text-anchor', 'middle')
     .attr("font-size", "20px")
     .text('Revenue');
@@ -236,7 +230,7 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
     .text('Running Time');
 
   // Append a `g` element for each data point in runningTimeData
-  const circles = svg.selectAll('.dot')
+  let circles = svg.selectAll('.dot')
     .data(runningTimeArray)
     .enter().append('g');
 
@@ -298,12 +292,88 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
     .call(brush);
 
   svg.append("text")
-    .attr("x", 40+(width / 2))
+    .attr("x", 40 + (width / 2))
     .attr("y", margin.top)
     .attr("text-anchor", "middle")
     .attr("font-size", "16px")
     .style("text-decoration", "underline")
     .text("Critics' Score Evolution");
 
+  function updateLine(data) {
+    console.log("updateLine")
+    let [newRevenueData, newRunningTimeData] = getLineData(data);
+    const newRevenueArray = Object.entries(newRevenueData).map(([year, revenue]) => ({ year: parseInt(year), revenue }));
+    const newRunningTimeArray = Object.entries(newRunningTimeData).map(([year, runningTime]) => ({ year: parseInt(year), runningTime }));
+
+    // Create a merged dataset that includes all the points from the old and new datasets
+    const mergedData = revenueArray.map(d => {
+      const newPoint = newRevenueArray.find(p => p.year === d.year);
+      return newPoint ? newPoint : { year: d.year, revenue: -500000000 };
+    });
+
+    // Create a merged dataset that includes all the points from the old and new datasets
+    const mergedData2 = runningTimeArray.map(d => {
+      const newPoint = newRunningTimeArray.find(p => p.year === d.year);
+      return newPoint ? newPoint : { year: d.year, runningTime: 0 };
+    });
+
+    const svg = d3.select('#lineplot').select('svg');
+
+    // Define the transiti
+    const t = d3.transition()
+      .duration(1000)
+      .ease(d3.easeCubic);
+
+    // Update the line with the merged data
+    revenuePath.datum(mergedData)
+      .transition(t)
+      .attr('d', line);
+
+    // After the transition, update the line with the new filtered data
+    revenuePath.transition()
+      .delay(1000)
+      .duration(0)
+      .attr('d', line(mergedData));
+
+
+
+    // Update the line with the merged data
+    runningTimePath.datum(mergedData2)
+      .transition(t)
+      .attr('d', line2);
+
+    // After the transition, update the line with the new filtered data
+    runningTimePath.transition()
+      .delay(1000)
+      .duration(0)
+      .attr('d', line2(mergedData2));
+
+    //flush all circles
+    svg.selectAll('.dot').remove();
+    svg.selectAll('circle').remove();
+
+    // Update revenueArray for future reference
+    let acircles = svg.selectAll('.dot')
+      .data(newRunningTimeArray)
+      .enter().append('g');
+
+    // Append a circle to each `g` element
+    acircles.append('circle')
+      .attr('class', 'dot')
+      .attr('cx', d => x(d.year))
+      .attr('cy', d => y2(d.runningTime))
+      .attr('r', 3);
+
+    let bcircles = svg.selectAll('circle')
+      .data(revenueArray)
+      .enter().append('g');
+    bcircles.append('circle')
+      .attr('cx', d => x(d.year))
+      .attr('cy', d => y(d.revenue))
+      .attr('r', 2.5)
+
+  }
+
+  return updateLine;
 }
 
