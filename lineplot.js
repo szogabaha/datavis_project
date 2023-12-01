@@ -1,4 +1,6 @@
-
+let revenuePath
+let revenueArray
+let line
 
 // Map data to the needs of the chart, groupby etc
 function getLineData(data, scorekind = "rotten_tomatoes") {
@@ -66,9 +68,11 @@ function getLineData(data, scorekind = "rotten_tomatoes") {
 }
 
 function updateLine(data) {
-  const transformedData = getLineData(data);
-  //TODO
+  let [newRevenueData, newRunningTimeData] = getLineData(data);
+  const newRevenueArray = Object.entries(newRevenueData).map(([year, revenue]) => ({ year: parseInt(year), revenue }));
+    
 }
+
 
 function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
 
@@ -77,7 +81,7 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
   console.log(runningTimeData)
 
   // Convert revenueData object to an array of objects for easier use with D3
-  const revenueArray = Object.entries(revenueData).map(([year, revenue]) => ({ year: parseInt(year), revenue }));
+  revenueArray = Object.entries(revenueData).map(([year, revenue]) => ({ year: parseInt(year), revenue }));
 
   // Set up the SVG container
   const svg = d3.select('#lineplot') // Select the body element or use an existing container
@@ -101,12 +105,12 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
     .range([innerHeight + margin.top, margin.top]);
 
   // Define the line function
-  const line = d3.line()
+  line = d3.line()
     .x(d => x(d.year))
     .y(d => y(d.revenue));
 
   // Append the line to the chart
-  svg.append('path')
+  revenuePath = svg.append('path')
     .datum(revenueArray)
     .attr('fill', 'none')
     .attr('stroke', 'steelblue')
@@ -114,7 +118,7 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
     .attr('d', line);
 
 
-  svg.selectAll('circle')
+  revenueCircles = svg.selectAll('circle')
     .data(revenueArray)
     .enter()
     .append('circle')
@@ -186,7 +190,7 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
     .y(d => y2(d.runningTime));
 
   // Draw the line for runningTimeData on the SVG container
-  svg.append('path')
+  runningTimePath = svg.append('path')
     .datum(runningTimeArray)
     .attr('fill', 'none')
     .attr('stroke', 'red')
@@ -263,6 +267,7 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
 
   function updateDataSelection() {
     var extent = d3.brushSelection(this);
+    console.log(extent);
     if (extent != null) {
       selection = extent.map(x.invert).map(Math.round);
       console.log(selection);
