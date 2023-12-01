@@ -1,3 +1,10 @@
+// set position of plot
+const barDiv = document.getElementById("barplot");
+barDiv.style.position = "relative";
+barDiv.style.left = 0 + "px"; // adjust as needed
+barDiv.style.top = 0 + "px"; // adjust as needed
+
+
 // Map data to the needs of the chart, groupby etc
 function getBarData(data, scorekind = "rotten_tomatoes") {
 

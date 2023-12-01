@@ -1,3 +1,10 @@
+// set position of plot
+const lineDiv = document.getElementById("lineplot");
+lineDiv.style.position = "relative";
+lineDiv.style.left = 0 + "px"; // adjust as needed
+lineDiv.style.top = 0 + "px"; // adjust as needed
+
+
 // Map data to the needs of the chart, groupby etc
 function getLineData(data, scorekind = "rotten_tomatoes") {
 
@@ -78,7 +85,7 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
   const revenueArray = Object.entries(revenueData).map(([year, revenue]) => ({ year: parseInt(year), revenue }));
 
   // Set up the SVG container
-  const svg = d3.select('body') // Select the body element or use an existing container
+  const svg = d3.select('#lineplot') // Select the body element or use an existing container
     .append('svg')
     .attr('width', width)
     .attr('height', height);

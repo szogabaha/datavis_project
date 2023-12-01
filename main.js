@@ -51,8 +51,8 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
     //call plots here
     //TODO, collect these parameters and inject them or hardwire inside? 
     plotExample1(data);
-    plotBar(data);
     plotLine(data);
+    plotBar(data);
     plotScatterMoney(data);
     plotScatterScore(data);
     //..

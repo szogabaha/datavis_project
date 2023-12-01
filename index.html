@@ -1,5 +1,21 @@
 <!doctype html>
+
 <html>
+	<style>
+		.grid-container {
+		  display: grid;
+		  grid-template-columns: auto auto auto;
+		  background-color: #2196F3;
+		  padding: 10px;
+		}
+		.grid-item {
+		  background-color: rgba(255, 255, 255, 0.8);
+		  border: 1px solid rgba(0, 0, 0, 0.8);
+		  padding: 20px;
+		  font-size: 30px;
+		  text-align: center;
+		}
+		</style>
 <head>
 	<meta charset="utf-8">
 	<meta name="description" content="">
@@ -9,8 +25,8 @@
 	
 	<div class="grid-container">
 		<div class="grid-item" id="lineplot"></div>
-        <div class="grid-item" id="barplot"></div>
 		<div class="grid-item" id="scatterplot_money"></div>
+        <div class="grid-item" id="barplot"></div>
 		<div class="grid-item" id="scatterplot_score"></div>
     </div>
 
