@@ -62,7 +62,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .range([0, scatterWidth]);
     g.append("g")
         .attr("transform", "translate(0," + scatterHeight + ")")
-        .call(d3.axisBottom(x).tickFormat(d3.format(".2s")));
+        .call(d3.axisBottom(x).tickFormat(d => "$" + d3.format(".2s")(d)));
 
     // add x axis label
     g.append("text")
@@ -70,14 +70,14 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("y", scatterHeight + margin.bottom - 5)
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
-        .text("Budget");
+        .text("Budget (million $)");
 
     // add y axis
     let y = d3.scaleLinear()
         .domain([0, d3.max(moneyData, d => d.box_office)])
         .range([scatterHeight, 0]);
     g.append("g")
-        .call(d3.axisLeft(y).tickFormat(d3.format(".2s")));
+        .call(d3.axisLeft(y).tickFormat(d => "$" + d3.format(".2s")(d)));
     
     // add y axis label
     g.append("text")
@@ -96,8 +96,8 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
 
     // add legend title
     g.append("text")
-        .attr("x", scatterWidth - 18)
-        .attr("y", -20)
+        .attr("x", scatterWidth - 10)
+        .attr("y", -15)
         .attr("text-anchor", "end")
         .style("font-size", "12px")
         .text("Revenue");
@@ -116,6 +116,17 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("height", 12)
         .style("fill", color);
 
+    // helper function to format numbers
+    function formatNumber(num) {
+        if (num <= -1e6) {
+            return "-$" + Math.abs((num / 1e6).toFixed(1)) + "M";
+        } else if (num >= 1e6) {
+            return "$" + (num / 1e6).toFixed(1) + "M";
+        } else {
+            return "$" + num;
+        }
+    }
+
     // draw legend text
     legend.append("text")
         .attr("x", scatterWidth - 24)
@@ -123,7 +134,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("dy", ".35em")
         .style("text-anchor", "end")
         .style("font-size", "10px")
-        .text(d => d.toLocaleString() + " $");
+        .text(d => formatNumber(d));
     
     // create scatterplot
     g.selectAll("circle")
@@ -140,7 +151,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
             tooltip.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltip.html(d.title + '<br/>' + 'Revenue: ' + "<br/>" + d.revenue.toLocaleString() + "$")
+            tooltip.html(d.title + '<br/>' + 'Revenue: ' + "<br/> $" + d.revenue.toLocaleString())
                 .style("left", (d3.event.pageX + 5) + "px")
                 .style("top", (d3.event.pageY - 28) + "px");
         }).on("mouseout", function (d) {
