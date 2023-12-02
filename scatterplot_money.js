@@ -1,4 +1,5 @@
-
+let circles;
+let g;
 
 // Map data to the needs of the chart, groupby etc
 function getScatterMoneyData(data) {
@@ -24,8 +25,12 @@ var EX1_CONFIG = null;
 // Update the chart according to some request
 // Receives the filtered data!
 function updateScatterMoney(data) {
-    const transformedData = getScatterMoneyData(data);
-    //Do the transition here using EX1_CONFIG + transformedData
+
+    // TODO: do nothing if data has not changed
+
+    let transformedData = getScatterMoneyData(data);
+
+    console.log("data: ", transformedData);
 
     // Define scales based on the new data
     let x = d3.scaleLinear()
@@ -42,24 +47,41 @@ function updateScatterMoney(data) {
     d3.select("#xAxis_money").transition().duration(1000).call(d3.axisBottom(x).tickFormat(d => "$" + d3.format(".2s")(d)));
     d3.select("#yAxis_money").transition().duration(1000).call(d3.axisLeft(y).tickFormat(d => "$" + d3.format(".2s")(d)));
 
-    // Select the circles and bind the new data
-    let circles = d3.select("#scatterplot_money").selectAll("circle").data(transformedData);
+    // bind new data to global circles
+    circles = g.selectAll("circle").data(transformedData);
 
-    // Use the general update pattern to handle the enter, update, and exit selections
+    // add new circles with transition from redius 0 to 5
     circles.enter().append("circle")
-        .attr("r", 5)
+        .attr("cx", d => x(d.budget))
+        .attr("cy", d => y(d.box_office))
+        .attr("r", 0)
         .attr("opacity", 0.7)
         .merge(circles) // Merges the enter and update selections
+        .on("mouseover", function (d) {
+            d3.select(this).attr('stroke', 'black').attr('stroke-width', 2); // Add black outline
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+            tooltip.html(d.title + '<br/>' + 'Revenue: ' + "<br/> $" + d.revenue.toLocaleString())
+                .style("left", (d3.event.pageX + 5) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+        }).on("mouseout", function (d) {
+            d3.select(this).attr('stroke', 'none'); // Remove black outline
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        })
         .transition() // Initiates a transition
         .duration(1000) // Specifies the duration
         .attr("cx", d => x(d.budget))
         .attr("cy", d => y(d.box_office))
-        .attr("fill", d => color(d.revenue));
+        .attr("fill", d => color(d.revenue))
+        .attr("r", 5);
 
-    // Transition the exiting circles to have zero radius and then remove them
+    // Remove old circles
     circles.exit()
         .transition()
-        .duration(800)
+        .duration(1000)
         .attr("r", 0)
         .remove();
 }
@@ -67,20 +89,18 @@ function updateScatterMoney(data) {
 // Do the plot here
 function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 400, animationDelay = 2000) {
 
-    const transformedData = getScatterMoneyData(data)
-
     let margin = { top: 30, right: 30, bottom: 40, left: 100 },
     scatterWidth = scatterTotalWidth - margin.left - margin.right,
     scatterHeight = scatterTotalHeight - margin.top - margin.bottom;
 
     let moneyData = getScatterMoneyData(data);
 
-    const svg = d3.select("#scatterplot_money")
+    let svg = d3.select("#scatterplot_money")
         .append("svg")
         .attr("width", scatterTotalWidth)
         .attr("height", scatterTotalHeight)
 
-    const g = svg.append("g")
+    g = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // add title
@@ -175,7 +195,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .text(d => formatNumber(d));
     
     // create scatterplot
-    g.selectAll("circle")
+    circles = g.selectAll("circle")
         .data(moneyData)
         .enter()
         .append("circle")
@@ -198,14 +218,13 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
                 .duration(500)
                 .style("opacity", 0);
         });
-
-
-  //Store everything here that the update will need
-  // EX1_CONFIG = {
-  //   "xTick": xTick,
-  //   "yTick": yTick,
-  //   "barHeight": barHeight
-  // }
+    
+    //Store everything here that the update will need
+    // EX1_CONFIG = {
+    //   "xTick": xTick,
+    //   "yTick": yTick,
+    //   "barHeight": barHeight
+    // }
 
 }
 
