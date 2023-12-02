@@ -31,6 +31,8 @@ function updateScatterScore(data) {
     const transformedData = getScatterScoreData(data);
     //Do the transition here using EX1_CONFIG + transformedData
 
+    // TODO: fix colour scale
+    
     // Define scales based on the new data
     let x = d3.scaleLinear()
         .domain([d3.min(transformedData, d => d.imdb), d3.max(transformedData, d => d.imdb)])
@@ -47,18 +49,41 @@ function updateScatterScore(data) {
      d3.select("#yAxis_score").transition().duration(1000).call(d3.axisLeft(y).tickFormat(d => "$" + d3.format(".2s")(d))); 
     
     // Select the circles and bind the new data
-    let circles = d3.select("#scatterplot_score").selectAll("circle").data(transformedData);
+    let circles = d3.select("#plot_score").selectAll("circle").data(transformedData);
 
-    // Use the general update pattern to handle the enter, update, and exit selections
-    circles.enter().append("circle")
-        .attr("r", 5)
-        .attr("opacity", 0.7)
-        .merge(circles) // Merges the enter and update selections
-        .transition() // Initiates a transition
-        .duration(1000) // Specifies the duration
+    // Transition the circles to their new position
+    circles.transition()
+        .duration(800)
         .attr("cx", d => x(d.imdb))
         .attr("cy", d => y(d.metascore))
         .attr("fill", d => color(d.revenue));
+    
+    // Add new circles
+    circles.enter()
+        .append("circle")
+        .attr("cx", d => x(d.imdb))
+        .attr("cy", d => y(d.metascore))
+        .attr("r", 0)
+        .attr("opacity", 0.7)
+        .attr("fill", d => color(d.revenue))
+        .merge(circles) // Merges the enter and update selections
+        .on("mouseover", function (d) {
+            d3.select(this).attr('stroke', 'black').attr('stroke-width', 2); // Add black outline
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+            tooltip.html(d.title + '<br/>' + 'Audience: ' + d.imdb + "<br/>" + 'Critics: ' + d.metascore)
+                .style("left", (d3.event.pageX + 5) + "px")
+                .style("top", (d3.event.pageY - 28) + "px");
+        }).on("mouseout", function (d) {
+            d3.select(this).attr('stroke', 'none'); // Remove black outline
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        })
+        .transition()
+        .duration(800)
+        .attr("r", 5);
 
     // Transition the exiting circles to have zero radius and then remove them
     circles.exit()
@@ -75,13 +100,14 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
 
     let scoreData = getScatterScoreData(data);
 
-    const svg = d3.select("#scatterplot_score")
+    let svg = d3.select("#scatterplot_score")
         .append("svg")
         .attr("width", scatterTotalWidth)
         .attr("height", scatterTotalHeight)
 
-    const g = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    let g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .attr("id", "plot_score");
 
     // add title
     g.append("text")
@@ -133,7 +159,7 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .range(["red", "orange", "yellow", "green", "blue"]);
 
     // create scatterplot
-    g.selectAll("dot")
+    g.selectAll("circle")
         .data(scoreData)
         .enter()
         .append("circle")
