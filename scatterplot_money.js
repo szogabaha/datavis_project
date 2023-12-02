@@ -1,6 +1,17 @@
 let circles_money;
 let g_money;
 
+// helper function to format numbers
+function formatNumber(num) {
+    if (num <= -1e6) {
+        return "-$" + Math.abs((num / 1e6).toFixed(1)) + "M";
+    } else if (num >= 1e6) {
+        return "$" + (num / 1e6).toFixed(1) + "M";
+    } else {
+        return "$" + num;
+    }
+}
+
 // Map data to the needs of the chart, groupby etc
 function getScatterMoneyData(data) {
 
@@ -27,11 +38,8 @@ var EX1_CONFIG = null;
 function updateScatterMoney(data) {
 
     // TODO: do nothing if data has not changed
-    // TODO: update legend
 
     let transformedData = getScatterMoneyData(data);
-
-    console.log("data: ", transformedData);
 
     // Define scales based on the new data
     let x = d3.scaleLinear()
@@ -47,6 +55,10 @@ function updateScatterMoney(data) {
     // Update the axes
     d3.select("#xAxis_money").transition().duration(1000).call(d3.axisBottom(x).tickFormat(d => "$" + d3.format(".2s")(d)));
     d3.select("#yAxis_money").transition().duration(1000).call(d3.axisLeft(y).tickFormat(d => "$" + d3.format(".2s")(d)));
+
+    // update legend text
+    var legend = d3.select("#scatterplot_money").selectAll(".legend").data(color.domain());
+    legend.select("text").text(d => formatNumber(d));
 
     // bind new data to global circles
     circles_money = g_money.selectAll("circle").data(transformedData);
@@ -175,17 +187,6 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("width", 12)
         .attr("height", 12)
         .style("fill", color);
-
-    // helper function to format numbers
-    function formatNumber(num) {
-        if (num <= -1e6) {
-            return "-$" + Math.abs((num / 1e6).toFixed(1)) + "M";
-        } else if (num >= 1e6) {
-            return "$" + (num / 1e6).toFixed(1) + "M";
-        } else {
-            return "$" + num;
-        }
-    }
 
     // draw legend text
     legend.append("text")
