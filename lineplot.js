@@ -110,10 +110,11 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
     .attr('d', line);
 
 
-  revenueCircles = svg.selectAll('circle')
+  revenueCircles = svg.selectAll('.dot')
     .data(revenueArray)
     .enter()
     .append('circle')
+    .attr('class', 'dot') // Assign the class here
     .attr('cx', d => x(d.year))
     .attr('cy', d => y(d.revenue))
     .attr('r', 2.5)
@@ -228,34 +229,33 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
     .style('text-anchor', 'start')
     .attr("font-size", "20px")
     .text('Running Time');
+  
 
-  // Append a `g` element for each data point in runningTimeData
-  let circles = svg.selectAll('.dot')
+  runningTimeCircles = svg.selectAll('.dotB')
     .data(runningTimeArray)
-    .enter().append('g');
-
-  // Append a circle to each `g` element
-  circles.append('circle')
-    .attr('class', 'dot')
+    .enter()
+    .append('circle')
+    .attr('class', 'dotB') // Assign the class here
     .attr('cx', d => x(d.year))
     .attr('cy', d => y2(d.runningTime))
-    .attr('r', 3);
-  // Add a mouseover event to each circle to display a tooltip
-  circles.on('mouseover', function (d) {
-    tooltip.transition()
-      .duration(200)
-      .style('opacity', .9);
-    tooltip.html(`Year: ${d.year}<br/>Running Time: ${d.runningTime}`)
-      .style('left', (d3.event.pageX + 5) + 'px')
-      .style('top', (d3.event.pageY - 28) + 'px');
-  });
-
-  // Add a mouseout event to each circle to hide the tooltip
-  circles.on('mouseout', function (d) {
-    tooltip.transition()
-      .duration(500)
-      .style('opacity', 0);
-  });
+    .attr('r', 2.5)
+    .on('mouseover', (d) => {
+      tooltip.transition()
+        .duration(200)
+        .style('opacity', .9);
+        tooltip.html(`Year: ${d.year}<br/>Running Time: ${d.runningTime}`)
+        .style('left', `${d3.event.pageX}px`)
+        .style('top', `${d3.event.pageY - 28}px`);
+    })
+    .on('mousemove', (d) => {
+      tooltip.style('left', `${d3.event.pageX}px`)
+        .style('top', `${d3.event.pageY - 28}px`);
+    })
+    .on('mouseout', (d) => {
+      tooltip.transition()
+        .duration(500)
+        .style('opacity', 0);
+    });
 
   function updateDataSelection() {
     var extent = d3.brushSelection(this);
@@ -349,28 +349,71 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
       .attr('d', line2(mergedData2));
 
     //flush all circles
-    svg.selectAll('.dot').remove();
-    svg.selectAll('circle').remove();
+    // Add a class to the old circles.
+    console.log(svg.selectAll('.dot'));
+console.log(svg.selectAll('.dotB'));
+svg.selectAll('.dot').remove();
+svg.selectAll('.dotB').remove();
+    
 
-    // Update revenueArray for future reference
-    let acircles = svg.selectAll('.dot')
-      .data(newRunningTimeArray)
-      .enter().append('g');
 
-    // Append a circle to each `g` element
-    acircles.append('circle')
-      .attr('class', 'dot')
-      .attr('cx', d => x(d.year))
-      .attr('cy', d => y2(d.runningTime))
-      .attr('r', 3);
+    // revenueCircles = svg.selectAll('.dot')
+    //   .data(newRevenueArray)
+    //   .enter()
+    //   .append('circle')
+    //   .attr('cx', d => x(d.year))
+    //   .attr('cy', d => y(d.revenue))
+    //   .attr('r', 2.5)
+    //   .on('mouseover', (d) => {
+    //     tooltip.transition()
+    //       .duration(200)
+    //       .style('opacity', .9);
+    //     tooltip.html(`Revenue: ${d.revenue}`)
+    //       .style('left', `${d3.event.pageX}px`)
+    //       .style('top', `${d3.event.pageY - 28}px`);
+    //   })
+    //   .on('mousemove', (d) => {
+    //     tooltip.style('left', `${d3.event.pageX}px`)
+    //       .style('top', `${d3.event.pageY - 28}px`);
+    //   })
+    //   .on('mouseout', (d) => {
+    //     tooltip.transition()
+    //       .duration(500)
+    //       .style('opacity', 0);
+    //   });
 
-    let bcircles = svg.selectAll('circle')
-      .data(revenueArray)
-      .enter().append('g');
-    bcircles.append('circle')
-      .attr('cx', d => x(d.year))
-      .attr('cy', d => y(d.revenue))
-      .attr('r', 2.5)
+
+    // // Append a `g` element for each data point in runningTimeData
+    // let circles = svg.selectAll('.dot')
+    //   .data(newRunningTimeArray)
+    //   .enter().append('g');
+
+    // // Append a circle to each `g` element
+    // circles.append('circle')
+    //   .attr('class', 'dot')
+    //   .attr('cx', d => x(d.year))
+    //   .attr('cy', d => y2(d.runningTime))
+    //   .attr('r', 3);
+    // // Add a mouseover event to each circle to display a tooltip
+    // circles.on('mouseover', function (d) {
+    //   tooltip.transition()
+    //     .duration(200)
+    //     .style('opacity', .9);
+    //   tooltip.html(`Year: ${d.year}<br/>Running Time: ${d.runningTime}`)
+    //     .style('left', (d3.event.pageX + 5) + 'px')
+    //     .style('top', (d3.event.pageY - 28) + 'px');
+    // });
+
+    // // Add a mouseout event to each circle to hide the tooltip
+    // circles.on('mouseout', function (d) {
+    //   tooltip.transition()
+    //     .duration(500)
+    //     .style('opacity', 0);
+    // });
+
+
+
+
 
   }
 
