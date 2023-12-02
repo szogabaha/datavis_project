@@ -1,12 +1,3 @@
-let bars
-let yearScores
-
-let x
-let y
-
-let svg
-let animationDelay = 1000
-
 // Map data to the needs of the chart, groupby etc
 function getBarData(data, scorekind = "rotten_tomatoes") {
   
@@ -51,39 +42,8 @@ function getBarData(data, scorekind = "rotten_tomatoes") {
 
 }
 
-function updateBar(data) {
-  let scoreSelect = d3.select("#scoreSelect").node().value;
-  console.log(scoreSelect);
-  let newAverageData = getBarData(data, scoreSelect);
-  // Initialize all years to 0
-  let allYearsData = {};
-  for (let year = 1900; year <= new Date().getFullYear(); year++) {
-    allYearsData[year] = 0;
-  }
-
-  // Update the years present in newAverageData
-  for (let year in newAverageData) {
-    allYearsData[year] = newAverageData[year];
-  }
-
-  // Update the bars
-  bars.attr("x", (d) => x(d))
-    .attr("y", (d) => y(yearScores[d]))
-    .attr("width", x.bandwidth())
-    .attr("height", (d) => y(0) - y(yearScores[d]))
-    .transition()
-    .duration(animationDelay)
-    .attr("x", (d) => x(d))
-    .attr("y", (d) => y(allYearsData[d]))
-    .attr("width", x.bandwidth())
-    .attr("height", (d) => y(0) - y(allYearsData[d]));
-    
-
-  yearScores = allYearsData;
-}
-
 // Do the plot here
-function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400) {
+function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400, animationDelay = 1000) {
 
   let barMargin = { top: 30, right: 30, bottom: 40, left: 100 },
     barWidth = barTotalWidth - barMargin.left - barMargin.right,
@@ -122,17 +82,17 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400) {
     .attr("value", "imdb")
     .text("IMDB");
 
-  x = d3.scaleBand()
+  let x = d3.scaleBand()
     .domain(years)
     .range([barMargin.left, barTotalWidth - barMargin.right]);
 
-  y = d3.scaleLinear()
+  let y = d3.scaleLinear()
     .domain([0, 100])
     .range([barTotalHeight - barMargin.bottom, barMargin.top]);
 
 
 
-  bars = svg.selectAll("rect")
+  let bars = svg.selectAll("rect")
     .data(years)
     .enter()
     .append("rect")
@@ -222,8 +182,39 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400) {
     yearScores = averageData;
   });
 
-
+  function updateBar(data) {
+    let scoreSelect = d3.select("#scoreSelect").node().value;
+    console.log(scoreSelect);
+    let newAverageData = getBarData(data, scoreSelect);
+    // Initialize all years to 0
+    let allYearsData = {};
+    for (let year = 1900; year <= new Date().getFullYear(); year++) {
+      allYearsData[year] = 0;
+    }
+  
+    // Update the years present in newAverageData
+    for (let year in newAverageData) {
+      allYearsData[year] = newAverageData[year];
+    }
+  
+    // Update the bars
+    bars.attr("x", (d) => x(d))
+      .attr("y", (d) => y(yearScores[d]))
+      .attr("width", x.bandwidth())
+      .attr("height", (d) => y(0) - y(yearScores[d]))
+      .transition()
+      .duration(animationDelay)
+      .attr("x", (d) => x(d))
+      .attr("y", (d) => y(allYearsData[d]))
+      .attr("width", x.bandwidth())
+      .attr("height", (d) => y(0) - y(allYearsData[d]));
+      
+  
+    yearScores = allYearsData;
+  }
   updateBar(data);
+
+  return updateBar;
 
 
 }

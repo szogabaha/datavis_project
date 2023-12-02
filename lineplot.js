@@ -1,7 +1,3 @@
-let revenuePath
-let revenueArray
-let line
-
 // Map data to the needs of the chart, groupby etc
 function getLineData(data, scorekind = "rotten_tomatoes") {
 
@@ -97,12 +93,12 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
     .range([innerHeight + margin.top, margin.top]);
 
   // Define the line function
-  line = d3.line()
+  let line = d3.line()
     .x(d => x(d.year))
     .y(d => y(d.revenue));
 
   // Append the line to the chart
-  revenuePath = svg.append('path')
+  let revenuePath = svg.append('path')
     .datum(revenueArray)
     .attr('fill', 'none')
     .attr('stroke', 'steelblue')
@@ -110,7 +106,7 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
     .attr('d', line);
 
 
-  revenueCircles = svg.selectAll('.dot')
+  let revenueCircles = svg.selectAll('.dot')
     .data(revenueArray)
     .enter()
     .append('circle')
