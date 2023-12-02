@@ -1,5 +1,5 @@
-let circles;
-let g;
+let circles_money;
+let g_money;
 
 // Map data to the needs of the chart, groupby etc
 function getScatterMoneyData(data) {
@@ -27,6 +27,7 @@ var EX1_CONFIG = null;
 function updateScatterMoney(data) {
 
     // TODO: do nothing if data has not changed
+    // TODO: update legend
 
     let transformedData = getScatterMoneyData(data);
 
@@ -48,15 +49,15 @@ function updateScatterMoney(data) {
     d3.select("#yAxis_money").transition().duration(1000).call(d3.axisLeft(y).tickFormat(d => "$" + d3.format(".2s")(d)));
 
     // bind new data to global circles
-    circles = g.selectAll("circle").data(transformedData);
+    circles_money = g_money.selectAll("circle").data(transformedData);
 
     // add new circles with transition from redius 0 to 5
-    circles.enter().append("circle")
+    circles_money.enter().append("circle")
         .attr("cx", d => x(d.budget))
         .attr("cy", d => y(d.box_office))
         .attr("r", 0)
         .attr("opacity", 0.7)
-        .merge(circles) // Merges the enter and update selections
+        .merge(circles_money) // Merges the enter and update selections
         .on("mouseover", function (d) {
             d3.select(this).attr('stroke', 'black').attr('stroke-width', 2); // Add black outline
             tooltip.transition()
@@ -76,10 +77,10 @@ function updateScatterMoney(data) {
         .attr("cx", d => x(d.budget))
         .attr("cy", d => y(d.box_office))
         .attr("fill", d => color(d.revenue))
-        .attr("r", 5);
+        .attr("r", 4);
 
     // Remove old circles
-    circles.exit()
+    circles_money.exit()
         .transition()
         .duration(1000)
         .attr("r", 0)
@@ -100,11 +101,12 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("width", scatterTotalWidth)
         .attr("height", scatterTotalHeight)
 
-    g = svg.append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    g_money = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .attr("id", "plot_money");
 
     // add title
-    g.append("text")
+    g_money.append("text")
         .attr("x", (scatterWidth / 2))
         .attr("y", 10 - (margin.top / 2))
         .attr("text-anchor", "middle")
@@ -116,13 +118,13 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
     let x = d3.scaleLinear()
         .domain([0, d3.max(moneyData, d => d.budget)])
         .range([0, scatterWidth]);
-    g.append("g")
+    g_money.append("g")
         .attr("transform", "translate(0," + scatterHeight + ")")
         .attr("id", "xAxis_money")
         .call(d3.axisBottom(x).tickFormat(d => "$" + d3.format(".2s")(d)));
 
     // add x axis label
-    g.append("text")
+    g_money.append("text")
         .attr("x", scatterWidth / 2)
         .attr("y", scatterHeight + margin.bottom - 5)
         .attr("text-anchor", "middle")
@@ -133,12 +135,12 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
     let y = d3.scaleLinear()
         .domain([0, d3.max(moneyData, d => d.box_office)])
         .range([scatterHeight, 0]);
-    g.append("g")
+    g_money.append("g")
         .attr("id", "yAxis_money")
         .call(d3.axisLeft(y).tickFormat(d => "$" + d3.format(".2s")(d)));
     
     // add y axis label
-    g.append("text")
+    g_money.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left + 30)
         .attr("x", 0 - (scatterHeight / 2))
@@ -153,7 +155,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .range(["red", "orange", "yellow", "green", "blue"]);
 
     // add legend title
-    g.append("text")
+    g_money.append("text")
         .attr("x", scatterWidth - 10)
         .attr("y", -15)
         .attr("text-anchor", "end")
@@ -195,7 +197,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .text(d => formatNumber(d));
     
     // create scatterplot
-    circles = g.selectAll("circle")
+    circles_money = g_money.selectAll("circle")
         .data(moneyData)
         .enter()
         .append("circle")

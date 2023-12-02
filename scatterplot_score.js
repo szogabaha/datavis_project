@@ -3,6 +3,9 @@ let margin = { top: 30, right: 30, bottom: 40, left: 100 },
     scatterWidth = scatterTotalWidth - margin.left - margin.right,
     scatterHeight = scatterTotalHeight - margin.top - margin.bottom;
 
+let circles_score;
+let g_score;
+
 // Map data to the needs of the chart, groupby etc
 function getScatterScoreData(data) {
 
@@ -28,10 +31,7 @@ var EX1_CONFIG = null;
 // Update the chart according to some request
 // Receives the filtered data!
 function updateScatterScore(data) {
-    const transformedData = getScatterScoreData(data);
-    //Do the transition here using EX1_CONFIG + transformedData
-
-    // TODO: fix colour scale
+    let transformedData = getScatterScoreData(data);
     
     // Define scales based on the new data
     let x = d3.scaleLinear()
@@ -44,29 +44,20 @@ function updateScatterScore(data) {
         .domain([d3.min(transformedData, d => d.revenue), 0, (d3.max(transformedData, d => d.revenue))/8, (d3.max(transformedData, d => d.revenue))/4 , d3.max(transformedData, d => d.revenue)])
         .range(["red", "orange", "yellow", "green", "blue"]);
 
-     // Update the axes
-     d3.select("#xAxis_score").transition().duration(1000).call(d3.axisBottom(x).tickFormat(d => "$" + d3.format(".2s")(d)));
-     d3.select("#yAxis_score").transition().duration(1000).call(d3.axisLeft(y).tickFormat(d => "$" + d3.format(".2s")(d))); 
+    // Update the axes
+    d3.select("#xAxis_score").transition().duration(1000).call(d3.axisBottom(x).tickFormat(d => "$" + d3.format(".2s")(d)));
+    d3.select("#yAxis_score").transition().duration(1000).call(d3.axisLeft(y).tickFormat(d => "$" + d3.format(".2s")(d))); 
     
     // Select the circles and bind the new data
-    let circles = d3.select("#plot_score").selectAll("circle").data(transformedData);
+    // circles_score = d3.select("#plot_score").selectAll("circle").data(transformedData, function(d) { return d.id; }); 
+    circles_score = g_score.selectAll("circle").data(transformedData);
 
-    // Transition the circles to their new position
-    circles.transition()
-        .duration(800)
-        .attr("cx", d => x(d.imdb))
-        .attr("cy", d => y(d.metascore))
-        .attr("fill", d => color(d.revenue));
-    
-    // Add new circles
-    circles.enter()
-        .append("circle")
+    circles_score.enter().append("circle")
         .attr("cx", d => x(d.imdb))
         .attr("cy", d => y(d.metascore))
         .attr("r", 0)
         .attr("opacity", 0.7)
-        .attr("fill", d => color(d.revenue))
-        .merge(circles) // Merges the enter and update selections
+        .merge(circles_score) // Merges the enter and update selections
         .on("mouseover", function (d) {
             d3.select(this).attr('stroke', 'black').attr('stroke-width', 2); // Add black outline
             tooltip.transition()
@@ -82,21 +73,22 @@ function updateScatterScore(data) {
                 .style("opacity", 0);
         })
         .transition()
-        .duration(800)
-        .attr("r", 5);
+        .duration(1000)
+        .attr("cx", d => x(d.imdb))
+        .attr("cy", d => y(d.metascore))
+        .attr("fill", d => color(d.revenue))
+        .attr("r", 4);
 
-    // Transition the exiting circles to have zero radius and then remove them
-    circles.exit()
+    // Remove old circles
+    circles_score.exit()
         .transition()
-        .duration(800)
+        .duration(1000)
         .attr("r", 0)
         .remove();
 }
 
 // Do the plot here
 function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 400, animationDelay = 2000) {
-
-    const transformedData = getScatterScoreData(data)
 
     let scoreData = getScatterScoreData(data);
 
@@ -105,12 +97,12 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("width", scatterTotalWidth)
         .attr("height", scatterTotalHeight)
 
-    let g = svg.append("g")
+    g_score = svg.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         .attr("id", "plot_score");
 
     // add title
-    g.append("text")
+    g_score.append("text")
         .attr("x", (scatterWidth / 2))
         .attr("y", 10 - (margin.top / 2))
         .attr("text-anchor", "middle")
@@ -122,13 +114,13 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
     let x = d3.scaleLinear()
         .domain([d3.min(scoreData, d => d.imdb), d3.max(scoreData, d => d.imdb)])
         .range([0, scatterWidth]);
-    g.append("g")
+    g_score.append("g")
         .attr("transform", "translate(0," + scatterHeight + ")")
         .attr("id", "xAxis_score")
         .call(d3.axisBottom(x));
 
     // add x axis label
-    g.append("text")
+    g_score.append("text")
         .attr("x", scatterWidth / 2)
         .attr("y", scatterHeight + margin.bottom - 5)
         .attr("text-anchor", "middle")
@@ -139,12 +131,12 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
     let y = d3.scaleLinear()
         .domain([d3.min(scoreData, d => d. metascore), d3.max(scoreData, d => d.metascore)])
         .range([scatterHeight, 0]);
-    g.append("g")
+    g_score.append("g")
         .attr("id", "yAxis_score")
         .call(d3.axisLeft(y));
 
     // add y axis label
-    g.append("text")
+    g_score.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left + 30)
         .attr("x", 0 - (scatterHeight / 2))
@@ -159,13 +151,13 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .range(["red", "orange", "yellow", "green", "blue"]);
 
     // create scatterplot
-    g.selectAll("circle")
+    circles_score = g_score.selectAll("circle")
         .data(scoreData)
         .enter()
         .append("circle")
         .attr("cx", d => x(d.imdb))
         .attr("cy", d => y(d.metascore))
-        .attr("r", 5)
+        .attr("r", 4)
         .attr("opacity", 0.7)
         .attr("fill", d => color(d.revenue)) // change color based on Revenue
         .on("mouseover", function (d) {
