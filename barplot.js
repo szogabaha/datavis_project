@@ -155,19 +155,22 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400, animationDela
 
 
   document.getElementById('scoreSelect').addEventListener('change', function () {
-    let scoreType = this.value;
-    let averageData = getBarData(data, scoreType);
-    bars = svg.selectAll("rect").data(Object.keys(averageData));
-
-
-    // Use the .enter() method to create new bars for any new data
-    bars.enter().append("rect")
-      .attr("x", (d) => x(d))
-      .attr("width", x.bandwidth())
-      .attr("fill", "#69b3a2");
-
-    // Update the y attribute and height of all bars (both existing and new)
-    // Add a transition to animate the height change
+    console.log("UPDATEBARS")
+    let scoreSelect = d3.select("#scoreSelect").node().value;
+    console.log(scoreSelect);
+    let newAverageData = getBarData(data, scoreSelect);
+    // Initialize all years to 0
+    let allYearsData = {};
+    for (let year = 1900; year <= new Date().getFullYear(); year++) {
+      allYearsData[year] = 0;
+    }
+  
+    // Update the years present in newAverageData
+    for (let year in newAverageData) {
+      allYearsData[year] = newAverageData[year];
+    }
+  
+    // Update the bars
     bars.attr("x", (d) => x(d))
       .attr("y", (d) => y(yearScores[d]))
       .attr("width", x.bandwidth())
@@ -175,14 +178,16 @@ function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400, animationDela
       .transition()
       .duration(animationDelay)
       .attr("x", (d) => x(d))
-      .attr("y", (d) => y(averageData[d]))
+      .attr("y", (d) => y(allYearsData[d]))
       .attr("width", x.bandwidth())
-      .attr("height", (d) => y(0) - y(averageData[d]));
-
-    yearScores = averageData;
+      .attr("height", (d) => y(0) - y(allYearsData[d]));
+      
+  
+    yearScores = allYearsData;
   });
 
   function updateBar(data) {
+    console.log("UPDATEBARS")
     let scoreSelect = d3.select("#scoreSelect").node().value;
     console.log(scoreSelect);
     let newAverageData = getBarData(data, scoreSelect);
