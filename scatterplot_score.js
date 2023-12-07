@@ -45,12 +45,12 @@ function updateScatterScore(data) {
         .range(["red", "orange", "yellow", "green", "blue"]);
 
     // Update the axes
-    d3.select("#xAxis_score").transition().duration(1000).call(d3.axisBottom(x).tickFormat(d => "$" + d3.format(".2s")(d)));
-    d3.select("#yAxis_score").transition().duration(1000).call(d3.axisLeft(y).tickFormat(d => "$" + d3.format(".2s")(d))); 
+    d3.select("#xAxis_score").transition().duration(1000).call(d3.axisBottom(x).tickFormat(d => d3.format(".2s")(d)));
+    d3.select("#yAxis_score").transition().duration(1000).call(d3.axisLeft(y).tickFormat(d =>  d3.format(".2s")(d))); 
     
     // Select the circles and bind the new data
     // circles_score = d3.select("#plot_score").selectAll("circle").data(transformedData, function(d) { return d.id; }); 
-    circles_score = g_score.selectAll("circle").data(transformedData);
+    circles_score = g_score.selectAll("circle").data(transformedData, function(d) { return (d.imdb - d.metascore)});
 
     circles_score.enter().append("circle")
         .attr("cx", d => x(d.imdb))
@@ -152,7 +152,7 @@ function plotScatterScore(data, scatterTotalWidth = 600, scatterTotalHeight = 40
 
     // create scatterplot
     circles_score = g_score.selectAll("circle")
-        .data(scoreData)
+        .data(scoreData, function(d) { return (d.imdb - d.metascore); })
         .enter()
         .append("circle")
         .attr("cx", d => x(d.imdb))
