@@ -74,7 +74,7 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
   // Set up the SVG container
   const svg = d3.select('#lineplot') // Select the body element or use an existing container
     .append('svg')
-    .attr('width', width)
+    .attr('width', width+10)
     .attr('height', height);
 
   // Set margins and dimensions for the chart
@@ -153,7 +153,13 @@ function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
     .attr('transform', `rotate(-90) translate(${(-height / 2) + 30}, ${margin.left / 6})`)
     .style('text-anchor', 'middle')
     .attr("font-size", "20px")
-    .text('Revenue');
+    .text('Revenue ($)');
+
+    svg.append('text')
+    .attr('transform', `rotate(-90) translate(${(-height / 2) + 30}, ${width + 10})`)
+    .style('text-anchor', 'middle')
+    .attr("font-size", "20px")
+    .text('Running Time (min)');
 
 
   const legendColor = 'steelblue';
