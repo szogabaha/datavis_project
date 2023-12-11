@@ -1,11 +1,16 @@
 
 FONT_SIZE = 14;
 TRANSITION_TIME = 2000;
-// Obj, all data that the updateEx1Chart function needs
 var PIECOUNTRIES_CONFIG = null;
 
 function clickOnLegend(event, data) {
-    PIECOUNTRIES_CONFIG.deselectedCountries.push(event.country);
+    if(!PIECOUNTRIES_CONFIG.deselectedCountries.includes(event.country)) {
+        PIECOUNTRIES_CONFIG.deselectedCountries.push(event.country);
+    
+    } else {
+        PIECOUNTRIES_CONFIG.deselectedCountries = PIECOUNTRIES_CONFIG.deselectedCountries.filter(x => x !== event.country);
+    }
+
     data.map(e => {
         const remainingCountries = getCountryFromObject(e).filter(remaining => !PIECOUNTRIES_CONFIG.deselectedCountries.includes(remaining))
         e["pieSelected"] = remainingCountries.length !== 0;
@@ -21,7 +26,7 @@ function getCountryFromObject(obj) {
         return countryArray;
     }
     catch (error) { //Country field is not an array, parse it as a string
-        return [obj.Country == "" ? "Unknown": obj.Country]
+        return [obj.Country == "" ? "Unknown" : obj.Country]
     }
 }
 
@@ -33,13 +38,14 @@ function getPieCountriesData(data) {
         const countries = getCountryFromObject(obj);
         countries.forEach(e => {
             const existingObject = acc.find(accItem => accItem.country === e);
+            const showInThisPlot = obj.selected && !PIECOUNTRIES_CONFIG?.deselectedCountries.includes(e);
             if (existingObject) {
                 existingObject.count++;
-                if (obj.selected && !PIECOUNTRIES_CONFIG?.deselectedCountries.includes(e)) {
+                if (showInThisPlot) {
                     existingObject.selectedCount++;
                 }
             } else {
-                const newObj = { country: e, count: 1, selectedCount: obj.selected ? 1 : 0 };
+                const newObj = { country: e, count: 1, selectedCount: showInThisPlot ? 1 : 0 };
                 acc.push(newObj);
             }
         });
@@ -47,21 +53,8 @@ function getPieCountriesData(data) {
         return acc;
     }, []);
 
-    sorted = unsorted.sort((a, b) => b.selectedCount - a.selectedCount);
-
-    // Keep the first 4 items and create a "merged" element for the rest
-    const topFour = unsorted.slice(0, 4);
-    const rest = unsorted.slice(4);
-
-    // Calculate the sum of counts for the remaining elements
-    const sumOfRestCounts = rest.reduce((sum, obj) => sum + obj.count, 0);
-
-    // Create the "merged" element
-    const otherElement = { country: 'Other', count: sumOfRestCounts, selectedCount: rest.reduce((sum, obj) => sum + obj.selectedCount, 0) };
-    console.log(topFour)
-    // Concatenate the top four and the "merged" element
-    const result = topFour.concat(otherElement).filter(x => x.selectedCount !== 0);
-    return result;
+    sorted = unsorted.sort((a, b) => b.count - a.count);
+    return sorted;
 }
 
 
@@ -87,26 +80,12 @@ function updatePieCountries(data) {
             }
         });
 
-    PIECOUNTRIES_CONFIG.legend.selectAll('rect').remove();
-    PIECOUNTRIES_CONFIG.legend.selectAll('rect').data(updatedData).enter().append('rect')
-    .attr('id',d => d.country)
-    .attr('y', (d, i) => FONT_SIZE * i * 1.8)
-    .attr('width', FONT_SIZE)
-    .attr('height', FONT_SIZE)
-    .attr('fill', (d, i) => PIECOUNTRIES_CONFIG.color(i))
-    .attr('stroke', 'black')
-    .style('stroke-width', '1px')
-    .on('click', d => clickOnLegend(d, data));
+    PIECOUNTRIES_CONFIG["legend"].selectAll("text")
+                                .style('fill', "black") //Reset to black
+                                .filter((d, i) => PIECOUNTRIES_CONFIG.deselectedCountries.includes(d.country))
+                                .style('fill', "grey"); //Set deselected to grey
 
-
-    PIECOUNTRIES_CONFIG.legend.selectAll('text').remove();
-    PIECOUNTRIES_CONFIG.legend.selectAll('text').data(updatedData).enter().append('text')
-    .attr('id', d => d.country)
-    .text(d => d.country)
-    .attr('x', FONT_SIZE * 1.4)
-    .attr('y', (d, i) => FONT_SIZE * i * 1.8 + FONT_SIZE - 2)
-    .style('font-size', `${FONT_SIZE}px`);
-}
+    }
 
 // Do the plot here
 function plotPieCountries(data, width = 400, height = 400) {
@@ -121,7 +100,7 @@ function plotPieCountries(data, width = 400, height = 400) {
     // Set up the SVG container
     const svg = d3.select('#pieplot') // Select the body element or use an existing container
         .append('svg')
-        .attr('width', width + 10)
+        .attr('width', width + 155)
         .attr('height', height);
 
     const radius = Math.min(innerWidth, innerHeight) / 2;
@@ -133,14 +112,26 @@ function plotPieCountries(data, width = 400, height = 400) {
 
     // Title
     //addLabel(g,"Education", innerWidth / 2, 0, false);
+    svg.append("text")
+    .attr("x", 50 + (width / 2))
+    .attr("y", margin.top)
+    .attr("text-anchor", "middle")
+    .attr("font-size", 24)
+    .style("text-decoration", "underline")
+    .text("Countries");
 
-    let pie = d3.pie().sort((a,b) => (b.selectedCount - a.selectedCount));
+    let pie = d3.pie().sort((a, b) => (b.count - a.count));
 
     var arcGenerator = d3.arc()
-        .innerRadius(5 * radius / 8)
+        .innerRadius(0.001)
         .outerRadius(radius);
 
-    let color = d3.scaleOrdinal(['#4daf4a', '#377eb8', '#ff7f00', '#984ea3', '#e41a1c']);
+    // There is no 20 colored discrete colormap prepared
+    let color = d3.scaleOrdinal(['#4daf4a', '#377eb8', '#ff7f00', '#984ea3', 
+                                 '#e41a1c', '#dede00', '#7a7a7a', '#ffae42', 
+                                 '#5e3c99', '#2ca02c', '#d62728', '#9467bd',
+                                 '#8c564b', '#1f77b4', '#bcbd22', '#17becf',
+                                 '#FF69B4', '#00FA9A', '#FFD700']);
 
     let path = g.selectAll('path')
         .data(pie(transformedData.map(x => x.count)))
@@ -148,7 +139,21 @@ function plotPieCountries(data, width = 400, height = 400) {
         .append('path')
         .attr("transform", `translate(${innerWidth / 2}, ${radius + margin.top})`)
         .attr('d', arcGenerator)
-        .attr('fill', (d, i) => color(i));
+        .attr('fill', (d, i) => color(i))
+        .on('click', (d, i) => clickOnLegend(transformedData[i], data))
+        .on("mouseover", (d,i) => {
+            tooltip.transition()
+              .duration(400)
+              .style("opacity", .9);
+            tooltip.html("Country: " + transformedData[i].country + "<br/>" + "Num. of movies: " + transformedData[i].selectedCount)
+              .style("left", (d3.event.pageX) + "px")
+              .style("top", (d3.event.pageY - 28) + "px");
+          })
+          .on("mouseout", d => {
+            tooltip.transition()
+              .duration(500)
+              .style("opacity", 0);
+          });
 
     //Legend
     const legend = g
@@ -160,8 +165,9 @@ function plotPieCountries(data, width = 400, height = 400) {
         .data(transformedData)
         .enter()
         .append('rect')
-        .attr('id',d => d.country)
-        .attr('y', (d, i) => FONT_SIZE * i * 1.8)
+        .attr('id', d => d.country)
+        .attr('x', (d, i) => i < 9 ? 0 : FONT_SIZE * 10)
+        .attr('y', (d, i) => (FONT_SIZE * (i % 9) * 1.8))
         .attr('width', FONT_SIZE)
         .attr('height', FONT_SIZE)
         .attr('fill', (d, i) => color(i))
@@ -174,11 +180,13 @@ function plotPieCountries(data, width = 400, height = 400) {
         .data(transformedData)
         .enter()
         .append('text')
-            .attr('id', d => d.country)
-            .text(d => d.country)
-            .attr('x', FONT_SIZE * 1.4)
-            .attr('y', (d, i) => FONT_SIZE * i * 1.8 + FONT_SIZE - 2)
-            .style('font-size', `${FONT_SIZE}px`);
+        .attr('id', d => d.country)
+        .attr("cursor", "default")
+        .text(d => d.country)
+        .attr('x',(d,i) => i < 9 ? FONT_SIZE * 1.4 : FONT_SIZE * 11.4)
+        .attr('y', (d, i) => FONT_SIZE * (i % 9) * 1.8 + FONT_SIZE - 2)
+        .style('font-size', `${FONT_SIZE}px`)
+        .on('click', d => clickOnLegend(d, data));
 
 
     PIECOUNTRIES_CONFIG = {
