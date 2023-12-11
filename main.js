@@ -19,7 +19,7 @@ var tooltip = d3.select("body").append("div")
     .style("pointer-events", "none");
 
 d3.csv("data/walt_disney_movies.csv").then(data => {
-    console.log(data)
+
 
     // Remove columns form dataset: Based on, Distributed By, Language, Production Company, Starring
     data.forEach(d => {
@@ -35,7 +35,7 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
     // each ex1, ex2 etc.. refer to the filter mask of a specific chart
     data.map(d => {
         d["linePlotSelected"] = true;
-        //d["ex2Selected"] = true;
+        d["pieSelected"] = true;
         //...
         d["selected"] = true; //This is ex1 & ex2 & ex3 mask concat, all are true when starting 
     })
@@ -48,7 +48,7 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
         }
     });
 
-    console.log(data)
+
     data.map(x => x.selected = x.linePlotSelected); // && ex2Selected && ex3Selected ...);
 
     //call plots here
@@ -58,6 +58,7 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
     updateBar = plotBar(data);
     plotScatterMoney(data);
     plotScatterScore(data);
+    plotPieCountries(data);
     //..
 }).catch(function (error) {
     console.log(error);
@@ -66,11 +67,12 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
 // Transition view into the updated state
 // UpdatedSelection is the original data with modified filter flags
 function updateCharts(updatedSelection) {
-    updatedSelection.map(x => x.selected = x.linePlotSelected); // && ex2Selected && ex3Selected ...);
+    updatedSelection.map(x => x.selected = x.linePlotSelected & x.pieSelected); // && ex2Selected && ex3Selected ...);
     updateEx1(updatedSelection);
     updateBar(updatedSelection);
     updateLine(updatedSelection);
     updateScatterMoney(updatedSelection);
     updateScatterScore(updatedSelection);
+    updatePieCountries(updatedSelection);
     //...
 }
