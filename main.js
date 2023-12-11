@@ -36,7 +36,7 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
     data.map(d => {
         d["linePlotSelected"] = true;
         d["pieSelected"] = true;
-        //...
+        d["bubbleSelected"] = true;
         d["selected"] = true; //This is ex1 & ex2 & ex3 mask concat, all are true when starting 
     })
 
@@ -59,6 +59,7 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
     plotScatterMoney(data);
     plotScatterScore(data);
     plotPieCountries(data);
+    plotBubblePeople(data);
     //..
 }).catch(function (error) {
     console.log(error);
@@ -67,12 +68,13 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
 // Transition view into the updated state
 // UpdatedSelection is the original data with modified filter flags
 function updateCharts(updatedSelection) {
-    updatedSelection.map(x => x.selected = x.linePlotSelected & x.pieSelected); // && ex2Selected && ex3Selected ...);
+    updatedSelection.map(x => x.selected = x.linePlotSelected & x.pieSelected & x.bubbleSelected); // && ex2Selected && ex3Selected ...);
     updateEx1(updatedSelection);
     updateBar(updatedSelection);
     updateLine(updatedSelection);
     updateScatterMoney(updatedSelection);
     updateScatterScore(updatedSelection);
     updatePieCountries(updatedSelection);
+    updateBubblePeople(updatedSelection);
     //...
 }
