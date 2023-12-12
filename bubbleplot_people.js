@@ -120,7 +120,7 @@ function updateBubblePeople(data) {
 	BUBBLE_CONFIG.bubbles
 		.transition()
 		.duration(1000)
-		.attr("r", d => d.r)
+		.attr("r", d => d.data.revenue > 0.1 ? d.r : 0.1) //Hide circle if revenue is artificially set to 0.1
 		.attr("stroke", "black")
 		.attr("stroke-width", d => `${BUBBLE_CONFIG.selectedPeople.map(x => x.name).includes(d.data.name) ? 5 : 0}`)
 		.attr("transform", d => `translate(${d.x},${d.y})`);
