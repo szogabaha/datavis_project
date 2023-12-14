@@ -64,7 +64,7 @@ function getLineData(data, scorekind = "rotten_tomatoes") {
 }
 
 
-function plotLine(data, width = 1000, height = 400, animationDelay = 2000) {
+function plotLine(data, width = 650, height = 400, animationDelay = 2000) {
 
   let [revenueData, runningTimeData] = getLineData(data);
 

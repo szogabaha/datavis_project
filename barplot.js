@@ -43,7 +43,7 @@ function getBarData(data, scorekind = "rotten_tomatoes") {
 }
 
 // Do the plot here
-function plotBar(data, barTotalWidth = 1000, barTotalHeight = 400, animationDelay = 1000) {
+function plotBar(data, barTotalWidth = 650, barTotalHeight = 400, animationDelay = 1000) {
 
   let barMargin = { top: 30, right: 30, bottom: 40, left: 100 },
     barWidth = barTotalWidth - barMargin.left - barMargin.right,
