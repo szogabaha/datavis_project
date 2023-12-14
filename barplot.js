@@ -59,10 +59,15 @@ function plotBar(data, barTotalWidth = 650, barTotalHeight = 400, animationDelay
     .attr("width", barTotalWidth)
     .attr("height", barTotalHeight + 40);
 
+  d3.select("#barplot")
+    .style("position", "relative");
 
   // Append a select element to the barplot div
   let scoreSelect = d3.select("#barplot").append("select")
-    .attr("transform", `translate(100, ${barMargin.top})`)
+    //.attr("transform", `translate(0, 0)`)
+    .style("position", "absolute")
+    .style("left", "600px")
+    .style("top", "20px")
     .attr("id", "scoreSelect")
 
   // Append option elements to the select element
