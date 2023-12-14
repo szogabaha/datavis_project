@@ -91,11 +91,11 @@ function getTopRevenueObjects(data, N) {
 function getBubblePeopleData(data) {
 	let unsorted = data.reduce((acc, obj) => {
 		const directors = getPeopleFromObject(obj["Directed by"]);
-		directors.forEach(e => accumulatePerson(e, acc, obj, "director"));
+		directors.forEach(e => accumulatePerson(e, acc, obj, "Director"));
 		const editors = getPeopleFromObject(obj["Edited by"]);
-		editors.forEach(e => accumulatePerson(e, acc, obj, "editor"));
+		editors.forEach(e => accumulatePerson(e, acc, obj, "Editor"));
 		const musicians = getPeopleFromObject(obj["Music by"]);
-		musicians.forEach(e => accumulatePerson(e, acc, obj, "musician"));
+		musicians.forEach(e => accumulatePerson(e, acc, obj, "Musician"));
 
 		return acc;
 	}, []);

@@ -51,16 +51,12 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
 
     data.map(x => x.selected = x.linePlotSelected); // && ex2Selected && ex3Selected ...);
 
-    //call plots here
-    //TODO, collect these parameters and inject them or hardwire inside? 
-    plotExample1(data);
     updateLine = plotLine(data);
     updateBar = plotBar(data);
     plotScatterMoney(data);
     plotScatterScore(data);
     plotPieCountries(data);
     plotBubblePeople(data);
-    //..
 }).catch(function (error) {
     console.log(error);
 });
@@ -69,12 +65,10 @@ d3.csv("data/walt_disney_movies.csv").then(data => {
 // UpdatedSelection is the original data with modified filter flags
 function updateCharts(updatedSelection) {
     updatedSelection.map(x => x.selected = x.linePlotSelected & x.pieSelected & x.bubbleSelected); // && ex2Selected && ex3Selected ...);
-    updateEx1(updatedSelection);
     updateBar(updatedSelection);
     updateLine(updatedSelection);
     updateScatterMoney(updatedSelection);
     updateScatterScore(updatedSelection);
     updatePieCountries(updatedSelection);
     updateBubblePeople(updatedSelection);
-    //...
 }
