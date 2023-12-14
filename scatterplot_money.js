@@ -171,7 +171,7 @@ function plotScatterMoney(data, scatterTotalWidth = 600, scatterTotalHeight = 40
         .attr("x", scatterWidth - 10)
         .attr("y", -15)
         .attr("text-anchor", "end")
-        .style("font-size", "12px")
+        .style("font-size", "18px")
         .text("Revenue");
     
     // add legend

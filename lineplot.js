@@ -296,7 +296,7 @@ function plotLine(data, width = 650, height = 400, animationDelay = 2000) {
     .attr("x", 40 + (width / 2))
     .attr("y", margin.top)
     .attr("text-anchor", "middle")
-    .attr("font-size", "16px")
+    .attr("font-size", "25px")
     .style("text-decoration", "underline")
     .text("Critics' Score Evolution");
 

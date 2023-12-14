@@ -141,7 +141,7 @@ function plotBar(data, barTotalWidth = 650, barTotalHeight = 400, animationDelay
     .attr("x", barMargin.left + barWidth / 2)
     .attr("y", barMargin.top)
     .attr("text-anchor", "middle")
-    .attr("font-size", "16px")
+    .attr("font-size", "25px")
     .style("text-decoration", "underline")
     .text("Critics' Score Evolution");
 
