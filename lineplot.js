@@ -263,7 +263,6 @@ function plotLine(data, width = 650, height = 400, animationDelay = 2000) {
     var extent = d3.brushSelection(this);
     if (extent != null) {
       selection = extent.map(x.invert).map(Math.round);
-      console.log(selection);
       //set attribute linePlotSelected of items of data that year is within selection
       data.forEach(d => {
         //"Release date": "1937-05-19"
@@ -302,7 +301,6 @@ function plotLine(data, width = 650, height = 400, animationDelay = 2000) {
     .text("Critics' Score Evolution");
 
   function updateLine(data) {
-    console.log("updateLine")
     let [newRevenueData, newRunningTimeData] = getLineData(data);
     const newRevenueArray = Object.entries(newRevenueData).map(([year, revenue]) => ({ year: parseInt(year), revenue }));
     const newRunningTimeArray = Object.entries(newRunningTimeData).map(([year, runningTime]) => ({ year: parseInt(year), runningTime }));

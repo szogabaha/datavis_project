@@ -17,7 +17,6 @@ function getBarData(data, scorekind = "rotten_tomatoes") {
     return acc;
   }, {});
 
-  console.log(groupedData)
   //remove key NaN
   delete groupedData["NaN"]
 
@@ -63,10 +62,8 @@ function plotBar(data, barTotalWidth = 650, barTotalHeight = 400, animationDelay
 
   // Append a select element to the barplot div
   let scoreSelect = d3.select("#barplot").append("select")
+    .attr("transform", `translate(100, ${barMargin.top})`)
     .attr("id", "scoreSelect")
-    .style("position", "relative")
-    .style("right", "-250px") // adjust as needed
-    .style("top", "-425px"); // adjust as needed
 
   // Append option elements to the select element
 
@@ -81,6 +78,7 @@ function plotBar(data, barTotalWidth = 650, barTotalHeight = 400, animationDelay
   scoreSelect.append("option")
     .attr("value", "imdb")
     .text("IMDB");
+
 
   let x = d3.scaleBand()
     .domain(years)
@@ -164,9 +162,7 @@ function plotBar(data, barTotalWidth = 650, barTotalHeight = 400, animationDelay
 
 
   document.getElementById('scoreSelect').addEventListener('change', function () {
-    console.log("UPDATEBARS")
     let scoreSelect = d3.select("#scoreSelect").node().value;
-    console.log(scoreSelect);
     let newAverageData = getBarData(data, scoreSelect);
     // Initialize all years to 0
     let allYearsData = {};
@@ -196,9 +192,7 @@ function plotBar(data, barTotalWidth = 650, barTotalHeight = 400, animationDelay
   });
 
   function updateBar(data) {
-    console.log("UPDATEBARS")
     let scoreSelect = d3.select("#scoreSelect").node().value;
-    console.log(scoreSelect);
     let newAverageData = getBarData(data, scoreSelect);
     // Initialize all years to 0
     let allYearsData = {};
