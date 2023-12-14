@@ -65,8 +65,8 @@ function plotBar(data, barTotalWidth = 650, barTotalHeight = 400, animationDelay
   let scoreSelect = d3.select("#barplot").append("select")
     .attr("id", "scoreSelect")
     .style("position", "relative")
-    .style("right", "150px") // adjust as needed
-    .style("top", "-410px"); // adjust as needed
+    .style("right", "-250px") // adjust as needed
+    .style("top", "-425px"); // adjust as needed
 
   // Append option elements to the select element
 
@@ -115,11 +115,20 @@ function plotBar(data, barTotalWidth = 650, barTotalHeight = 400, animationDelay
         .style("opacity", 0);
     });
 
+    // Assuming x is your scale and data is your dataset
+  let minYear = d3.min(data, function(d) { return d.year; });
+  let maxYear = d3.max(data, function(d) { return d.year; });
+
+  // Generate an array of years from minYear to maxYear, stepping by 5 years
+  let tickValues = d3.range(minYear, maxYear + 1, 5);
+
+  // Add X axis
+  let xAxis = d3.axisBottom(x).tickValues(tickValues);
 
   // Add X and Y axis
   svg.append("g")
     .attr("transform", `translate(0, ${barTotalHeight - barMargin.bottom})`)
-    .call(d3.axisBottom(x))
+    .call(xAxis) // use numTicks as argument to ticks()
     .selectAll("text")
     .style("text-anchor", "end")
     .attr("dx", "-.8em")
